@@ -77,3 +77,6 @@ Built only from public material: the module and data files served by TSE's simul
 files that TSE itself publishes. Made for study (WebAssembly, and how the published simulator
 works). Not affiliated with or endorsed by TSE. The rights to the original software belong to their
 owners, and this repository does not grant a license to it.
+
+**Takedown requests.** If TSE or any other competent authority asks for it, this repository will be
+taken down promptly. To ask, open an issue here or get in touch through the GitHub profile.

@@ -79,4 +79,7 @@ Feito só com material público: o módulo e os arquivos de dados servidos pela 
 TSE, e arquivos que o próprio TSE publica. Feito para estudo (WebAssembly e o funcionamento do
 simulador publicado). Sem vínculo com o TSE e sem endosso dele. Os direitos sobre o software
 original pertencem aos seus titulares, e este repositório não concede licença sobre ele.
-# urna-vota-decompiled
+
+**Pedido de remoção.** Se o TSE ou outra autoridade competente solicitar, este repositório será
+retirado do ar prontamente. Para pedir, basta abrir uma issue aqui ou entrar em contato pelo perfil
+do GitHub.
