@@ -1,0 +1,180 @@
+-- ModuloResultadoUrnaCadastro.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- Attendance data returned to the voter registry: who voted, how enabled, mesarios, justificativas.
+
+ModuloResultadoUrnaCadastro DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+IMPORTS
+    RegistroIdentificacaoEleitor, SituacaoArquivo
+        FROM ModuloTiposEcoUrna
+    CabecalhoEntidade, DataHoraJE, Fase, IdentificacaoSecaoEleitoral, TipoDedo
+        FROM ModuloTiposEleitorais;
+
+-- info @1147780; name: rtti+infoname (high)
+EntidadeResultadoUrnaCadastro ::= SEQUENCE {
+    cabecalho                              CabecalhoEntidade,
+    fase                                   Fase,
+    versaoVotacao                          GeneralString,
+    situacao                               SituacaoArquivo,
+    infoDadosComparecimento                InfoDadosComparecimento
+}
+
+-- info @1147524; name: rtti+infoname (high)
+EstadoComparecimento ::= SEQUENCE {
+    identificacaoEleitor                   RegistroIdentificacaoEleitor,
+    situacaoComparecimentoEleitor          SituacaoComparecimentoEleitor,
+    apresentacaoFoto                       [1] ApresentacaoFotoEleitor OPTIONAL,
+    situacaoHabilitacaoAudio               [2] SituacaoHabilitacaoAudio OPTIONAL,
+    habilitacaoBiometrica                  [3] HabilitacaoBiometrica OPTIONAL
+}
+
+-- info @1147420; name: rtti+infoname (high)
+EstadoHabilitacaoPorCodigo ::= SEQUENCE {
+    situacaoReconhecimentoMesario          SituacaoReconhecimentoMesario,
+    identificacaoMesario                   RegistroIdentificacaoEleitor OPTIONAL
+}
+
+-- info @1147316; name: rtti+infoname (high)
+ApresentacaoFotoEleitor ::= SEQUENCE {
+    estadoApresentacao                     EstadoApresentacaoFotoEleitor,
+    resultadoApresentacao                  ResultadoApresentacaoFotoEleitor
+}
+
+-- info @1147368; name: rtti+infoname (high)
+ComparecimentoMesario ::= SEQUENCE {
+    identificacaoMesario                   RegistroIdentificacaoEleitor,
+    dataHoraColeta                         DataHoraJE,
+    estadoColetaDigital                    EstadoColetaDigital OPTIONAL
+}
+
+-- info @1147576; name: rtti+infoname (high)
+ComparecimentoSecao ::= SEQUENCE {
+    identificacao                          IdentificacaoSecaoEleitoral,
+    eleitores                              SEQUENCE OF EstadoComparecimento
+}
+
+-- info @1146992; name: rtti+infoname (high)
+DadosCifracao ::= SEQUENCE {
+    chave                                  OCTET STRING,
+    salt                                   OCTET STRING,
+    informacaoAdicional                    OCTET STRING
+}
+
+-- info @1147692; name: rtti+infoname (high)
+DadosComparecimento ::= SEQUENCE {
+    justificativas                         SEQUENCE OF IdentificacaoJustificativa,
+    identificacaoComparecimento            ComparecimentoSecao,
+    mesariosAbertura                       [1] SEQUENCE OF ComparecimentoMesario OPTIONAL,
+    mesariosEncerramento                   [2] SEQUENCE OF ComparecimentoMesario OPTIONAL
+}
+
+-- info @1147044; name: rtti+infoname (high)
+DadosComparecimentoCifrado ::= SEQUENCE {
+    dadosCifracao                          DadosCifracao,
+    conteudo                               OCTET STRING
+}
+
+-- info @1147472; name: rtti+infoname (high)
+HabilitacaoBiometrica ::= SEQUENCE {
+    tentativasHabilitacaoBiometrica        INTEGER,
+    dedoHabilitado                         TipoDedo,
+    erroLeituraBiometria                   ErroLeituraBiometria,
+    habilitacaoPorCodigo                   [1] EstadoHabilitacaoPorCodigo OPTIONAL,
+    ultimoScore                            [2] INTEGER (0..999) OPTIONAL
+}
+
+-- info @1147096; name: rtti+infoname (high)
+IdentificacaoJustificativa ::= SEQUENCE {
+    identificacaoEleitor                   RegistroIdentificacaoEleitor,
+    anoNascimentoEleitor                   INTEGER (0..9999)
+}
+
+-- info @1147744; name: inferred (low) <<< placeholder name, not in the binary; module: inferred from the types that use it
+InfoDadosComparecimento ::= CHOICE {
+    dadosComparecimento                    [0] DadosComparecimento,
+    dadosComparecimentoCifrado             [1] DadosComparecimentoCifrado
+}
+
+-- info @1147244; name: rtti (high)
+ErroLeituraBiometria ::= ENUMERATED {
+    semErro (0),
+    tipoArquivoInvalido (1),
+    idCriptografiaInvalido (2),
+    chaveSecretaVazia (3),
+    chaveSecaoVazia (4),
+    conteudoVazio (5),
+    chaveSecaoComTamanhoInvalido (6),
+    chaveSecretaComTamanhoInvalido (7),
+    naoFoiPossivelIniciarADecifragem (8),
+    erroDecifrandoBuffer (9),
+    erroDesconhecidoDeCriptografia (10),
+    erroFormacaoTemplate (11),
+    erroCodificacaoMinuncias (12)
+}
+
+-- info @1147172; name: rtti (high)
+EstadoApresentacaoFotoEleitor ::= ENUMERATED {
+    eleitorSemFoto (1),
+    apresentada (2),
+    naoApresentadaPorErro (3)
+}
+
+-- info @1147268; name: rtti (high)
+EstadoColetaDigital ::= ENUMERATED {
+    naoColetadaReconhecidaNoCadastro (1),
+    coletadaMesarioNaoPossuiDigitalNoCadastro (2),
+    coletadaDigitalNaoReconhecidaNoCadastro (3),
+    coletadaMesarioNaoPertenceASecao (4)
+}
+
+-- info @1147196; name: rtti (high)
+ResultadoApresentacaoFotoEleitor ::= ENUMERATED {
+    semErro (0),
+    erroFormato (1),
+    erroFormacaoImagem (2),
+    erroResolucao (3),
+    erroCompressao (4),
+    erroProfundidadeCores (5),
+    erroApresentacao (6),
+    erroDecifrandoBuffer (7),
+    erroDesconhecidoDeCriptografia (8)
+}
+
+-- info @1147148; name: rtti (high)
+SituacaoComparecimentoEleitor ::= ENUMERATED {
+    faltou (1),
+    naoVotou (2),
+    votou (3),
+    semCargoParaVotar (4)
+}
+
+-- info @1147220; name: rtti (high)
+SituacaoHabilitacaoAudio ::= ENUMERATED {
+    automatica (1),
+    peloMesario (2),
+    naoHabilitado (3)
+}
+
+-- info @1147292; name: rtti (high)
+SituacaoReconhecimentoMesario ::= ENUMERATED {
+    naoReconhecido (1),
+    reconhecidoDigitalCadastroUrna (2),
+    reconhecidoDigitalRegistroMesarios (3)
+}
+
+END

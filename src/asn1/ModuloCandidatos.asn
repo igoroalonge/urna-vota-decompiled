@@ -1,0 +1,101 @@
+-- ModuloCandidatos.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- Candidates per cargo and party (aptos/inaptos, titular + suplentes/vices), file *-ca.dat.
+
+ModuloCandidatos DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+IMPORTS
+    Abrangencia, CabecalhoEntidade, CodigoCargoConsulta, CodigoSexo
+        FROM ModuloTiposEleitorais;
+
+-- info @1145048; name: rtti+infoname (high)
+EntidadeCandidatos ::= SEQUENCE {
+    cabecalho                              CabecalhoEntidade,
+    abrangencia                            Abrangencia,
+    cargos                                 SEQUENCE OF CandidatosPorCargos
+}
+
+-- info @1144880; name: infoname (high); module: inferred from the types that use it
+CandidatoPorPartido ::= SEQUENCE {
+    partido                                INTEGER (0..99),
+    candidatosAptos                        SEQUENCE OF Candidatura,
+    candidatosInaptos                      SEQUENCE OF Candidatura
+}
+
+-- info @1144964; name: infoname (high); module: inferred from the types that use it
+CandidatosPorCargos ::= SEQUENCE {
+    cargo                                  CodigoCargoConsulta,
+    quantidadeVagas                        INTEGER (0..99),
+    partidos                               SEQUENCE OF CandidatoPorPartido OPTIONAL
+}
+
+-- info @1144796; name: infoname (high)
+Candidatura ::= SEQUENCE {
+    numero                                 INTEGER (0..99999),
+    titular                                DadosCandidato,
+    drap                                   GeneralString (SIZE(0..18)),                          -- shared string typedef @1913468, name unknown
+    suplentesVices                         SEQUENCE OF DadosCandidato OPTIONAL
+}
+
+-- info @1144712; name: infoname (high)
+DadosCandidato ::= SEQUENCE {
+    codigo                                 [1] GeneralString (SIZE(0..18)),                      -- shared string typedef @1913468, name unknown
+    candidatoSubstituido                   [2] GeneralString (SIZE(0..18)) OPTIONAL,             -- shared string typedef @1913468, name unknown
+    nome                                   GeneralString (SIZE(1..70)),
+    nomeUrna                               GeneralString (SIZE(1..30)),
+    nomeSocial                             GeneralString (SIZE(1..70)) OPTIONAL,
+    nomeFonetico                           [3] GeneralString OPTIONAL,
+    dataNascimento                         NumericString (SIZE(8)),
+    sexo                                   CodigoSexo,
+    situacao                               SituacaoCandidatura,
+    situacaoCassacao                       [4] SituacaoCassacao OPTIONAL,
+    partido                                INTEGER (0..99),
+    ordemSuplencia                         [5] INTEGER (1..9) OPTIONAL,
+    reeleicao                              BOOLEAN
+}
+
+-- info @1146532; name: inferred (low) <<< placeholder name, not in the binary; module: inferred from the types that use it
+SituacaoCandidatura ::= ENUMERATED {
+    cadastrado (1),
+    deferido (2),
+    inapto (3),
+    indeferidoComRecurso (4),
+    cancelado (5),
+    renuncia (6),
+    falecido (7),
+    aguardandoJulgamento (8),
+    impugnado (11),
+    apto (12),
+    pedidoNaoConhecido (13),
+    indeferido (14),
+    comNoticiaInelegibilidade (15),
+    deferidoComRecurso (16),
+    candidatoPendenteJulgamento (17),
+    canceladoComRecurso (19),
+    pedidoNaoConhecidoComRecurso (20)
+}
+
+-- info @1146556; name: inferred (low) <<< placeholder name, not in the binary; module: inferred from the types that use it
+SituacaoCassacao ::= ENUMERATED {
+    cassado (1),
+    cassadoComRecurso (2),
+    regular (3),
+    levantado (4)
+}
+
+END

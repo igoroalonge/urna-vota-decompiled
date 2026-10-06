@@ -1,0 +1,64 @@
+-- ModuloLocal.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- Local: the place of the section loaded into this urna. File <mun><zona><secao>-lo.dat.
+
+ModuloLocal DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+IMPORTS
+    ComplementoMunicipio
+        FROM ModuloComplementosMunicipios
+    Municipio, TipoLocalVotacao
+        FROM ModuloTiposCadastro
+    IdentificacaoSecaoEleitoral, MunicipioZona, UF
+        FROM ModuloTiposEleitorais;
+
+-- info @1139308; name: rtti+infoname (high)
+IdentificacaoAgregada ::= SEQUENCE {
+    numero                                 INTEGER (1..9999),
+    tipoLocalOrigem                        TipoLocalVotacao
+}
+
+-- info @1139256; name: rtti+infoname (high)
+IdentificacaoUrnaContingencia ::= SEQUENCE {
+    municipioZona                          MunicipioZona
+}
+
+-- info @1139448; name: rtti+infoname (high)
+Local ::= SEQUENCE {
+    idPE                                   INTEGER (0..99999),
+    pais                                   GeneralString (SIZE(1..30)),
+    uf                                     UF,
+    municipio                              Municipio,
+    complementoMunicipio                   ComplementoMunicipio,
+    id                                     IdentificacaoLocal
+}
+
+-- info @1139360; name: rtti+infoname (high)
+SecaoEleitoral ::= SEQUENCE {
+    tipo                                   TipoLocalVotacao,
+    secao                                  IdentificacaoSecaoEleitoral,
+    agregadas                              SEQUENCE OF IdentificacaoAgregada OPTIONAL
+}
+
+-- info @1139412; name: inferred (low) <<< placeholder name, not in the binary; module: inferred from the types that use it
+IdentificacaoLocal ::= CHOICE {
+    secao                                  [1] EXPLICIT SecaoEleitoral,
+    contingencia                           [2] EXPLICIT IdentificacaoUrnaContingencia
+}
+
+END

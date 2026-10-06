@@ -1,0 +1,64 @@
+-- ModuloEstadoGeralGap.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- Persistent state of the application launcher (gap.bin).
+
+ModuloEstadoGeralGap DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+IMPORTS
+    NumViasImpressasRelatorios
+        FROM ModuloEstadoGeralDefs
+    DadoCorrespondencia
+        FROM ModuloEstadoGeralUrna
+    DataJE
+        FROM ModuloTiposEleitorais;
+
+-- info @1141808; name: rtti+infoname (high)
+EstadoGeralGap ::= SEQUENCE {
+    correspondencias                       SEQUENCE (SIZE(0..10)) OF DadoCorrespondencia,
+    appId                                  UrnaAplicativo,
+    appAnteriorId                          UrnaAplicativo,
+    executadoRED                           BOOLEAN,
+    identificadoATUE                       BOOLEAN,
+    audio                                  BOOLEAN,
+    data2T                                 BOOLEAN,
+    numViasImpressasRelatorios1T           NumViasImpressasRelatorios,
+    numViasImpressasRelatorios2T           NumViasImpressasRelatorios,
+    dataSegundoTurno                       DataJE OPTIONAL
+}
+
+-- info @1141784; name: rtti (high)
+UrnaAplicativo ::= ENUMERATED {
+    apvotatreinaeleitor1 (0),
+    apvotatreinaeleitor2 (1),
+    apvotatreinamesario1 (2),
+    apvotatreinamesario2 (3),
+    apvotasimula1 (4),
+    apvotasimula2 (5),
+    apvotaoficial1 (6),
+    apvotaoficial2 (7),
+    apapuracaotreina1 (8),
+    apapuracaotreina2 (9),
+    apapuracaosimula1 (10),
+    apapuracaosimula2 (11),
+    apapuracaooficial1 (12),
+    apapuracaooficial2 (13),
+    apsemaplicativo (14),
+    apultimoid (15)
+}
+
+END

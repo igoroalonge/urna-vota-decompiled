@@ -1,0 +1,80 @@
+-- ModuloInformacaoMidia.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- InformacaoMidia: what a flash medium is, for which election, who generated it, which apps it enables.
+
+ModuloInformacaoMidia DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+IMPORTS
+    IdentificadorGeradorMidia
+        FROM ModuloTiposEcoUrna
+    DataHoraJE, Fase, SiglaUF, Turno
+        FROM ModuloTiposEleitorais;
+
+-- info @1145252; name: rtti+infoname (high)
+Aplicativo ::= SEQUENCE {
+    tipoAplicativo                         TipoAplicativo,
+    autenticacao                           Autenticacao OPTIONAL
+}
+
+-- info @1145200; name: rtti+infoname (high)
+Autenticacao ::= SEQUENCE {
+    dataInicial                            [1] EXPLICIT DataHoraJE OPTIONAL,
+    dataFinal                              [2] EXPLICIT DataHoraJE OPTIONAL,
+    tamanhoSenha                           INTEGER,
+    numeroTentativas                       INTEGER,
+    hashSenha                              OCTET STRING
+}
+
+-- info @1145124; name: rtti+infoname (high)
+DadosGeracaoMidia ::= SEQUENCE {
+    serialMidia                            GeneralString,
+    usuario                                GeneralString,
+    identificadorGeradorMidia              IdentificadorGeradorMidia,
+    data                                   DataHoraJE
+}
+
+-- info @1145304; name: rtti+infoname (high)
+InformacaoMidia ::= SEQUENCE {
+    tipoMidia                              TipoMidia,
+    fase                                   Fase,
+    idPE                                   INTEGER (0..99999),
+    uf                                     SiglaUF,
+    turno                                  Turno,
+    dadosGeracaoMidia                      DadosGeracaoMidia,
+    aplicativos                            SEQUENCE OF Aplicativo OPTIONAL
+}
+
+-- info @1145176; name: rtti (high)
+TipoAplicativo ::= ENUMERATED {
+    vota (1),
+    sa (2),
+    red (3),
+    vpp (4),
+    ste (5),
+    adh (6),
+    atue (7)
+}
+
+-- info @1145100; name: rtti (high)
+TipoMidia ::= ENUMERATED {
+    mr (1),
+    fc (2),
+    fv (3)
+}
+
+END

@@ -1,0 +1,82 @@
+-- ModuloTiposPacotes.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- TipoPacote: kinds of data packages exchanged between TSE systems (.pid files).
+
+ModuloTiposPacotes DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+-- info @1146200; name: rtti (high)
+TipoPacote ::= ENUMERATED {
+    pacoteEleitores (1),
+    pacoteMunicipiosZonas (2),
+    pacoteImpedidos (5),
+    pacoteCandidatosTRE (7),
+    pacoteFotosCandidatosTRE (8),
+    pacoteCorrespondencia (9),
+    pacoteSecoes (10),
+    pacoteNotificacaoPacote (13),
+    pacoteConfiguracaoProcessoEleitoral (14),
+    pacoteValidacaoCandidatos (15),
+    pacoteAlteracaoCandidaturaTRE (16),
+    pacoteResultadoTotalizacao (17),
+    pacoteRespostaVersaoPacote (18),
+    pacoteJuntas (21),
+    pacoteEleicoesSegundoTurno (22),
+    pacoteParametrosUrna (23),
+    pacoteNotificacaoImportacao (24),
+    pacotePrestacaoContas (25),
+    pacoteSolicitacaoEstadoSistema (26),
+    pacoteRespostaEstadoSistema (27),
+    pacoteSolicitacaoVersaoPacote (28),
+    pacoteProcessamentoResultadoUrnaCadastro (29),
+    pacoteNotificacaoDisponibilidadeSistema (30),
+    pacoteCandidatosTSE (31),
+    pacoteFotosCandidatosTSE (32),
+    pacoteAlteracaoCandidaturaTSE (33),
+    pacoteSolicitacaoDadosCadastro (34),
+    pacoteDadosEleitor (35),
+    pacoteDadosDocumentacaoCandidatura (36),
+    pacoteComplementosMunicipios (37),
+    pacoteEleicao (39),
+    pacoteSituacoesEleicoes (40),
+    pacoteRespostaAlteracaoCandidatura (41),
+    pacoteSolicitacaoResultadoUrnaCadastro (42),
+    pacoteRespostaSolicitacaoResultadoUrnaCadastro (43),
+    pacoteSolicitacaoMunicipiosZonasParcial (44),
+    pacoteConsolidadoEleicao (45),
+    pacoteConsolidadoSituacoesEleicoes (46),
+    pacoteCandidatosPrestacaoContas (47),
+    pacoteTransferenciaTemporariaEleitores (48),
+    pacoteResumoMunicipios (49),
+    pacoteAlteracoesCadastro (50),
+    pacoteSolicitacaoResumoMunicipios (52),
+    pacoteIndicarVersaoImportacaoPacotes (53),
+    pacoteRespostaIndicarVersaoImportacaoPacotes (54),
+    pacoteNotificacaoRecebimento (55),
+    pacoteSituacaoCorrespondencia (56),
+    pacoteSolicitacaoValidacaoPacotes (57),
+    pacoteRespostaValidacaoPacotes (58),
+    pacoteSolicitacaoResumoIntegracao (59),
+    pacoteRespostaResumoIntegracao (60),
+    pacoteMigracaoMunicipioEleicao (61),
+    pacoteOperacaoCorrespondencia (62),
+    pacoteRespostaProcessamentoResultadoUrnaCadastro (63),
+    pacoteApagaResultadoTotalizacao (64),
+    pacoteAlteracaoEleicoesPleitoFechado (65)
+}
+
+END

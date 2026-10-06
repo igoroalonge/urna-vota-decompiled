@@ -1,0 +1,262 @@
+-- ModuloTiposEleitorais.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- Shared electoral types: JE date formats, processo/pleito/eleicao identifiers, section identification, cargo codes, Fase, entity and package headers.
+
+ModuloTiposEleitorais DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+IMPORTS
+    TipoPacote
+        FROM ModuloTiposPacotes;
+
+-- info @1140880; name: rtti+infoname (high)
+Abrangencia ::= SEQUENCE {
+    tipo                                   TipoAbrangencia,
+    id                                     IdentificacaoAbrangencia OPTIONAL
+}
+
+-- info @1140956; name: rtti+infoname (high)
+ArquivoAssinatura ::= SEQUENCE {
+    nomeArquivo                            GeneralString,
+    assinatura                             GeneralString
+}
+
+-- info @1141220; name: rtti+infoname (high)
+CabecalhoEntidade ::= SEQUENCE {
+    dataGeracao                            DataHoraJE,
+    idEleitoral                            IDEleitoral
+}
+
+-- info @1141360; name: rtti+infoname (high)
+CabecalhoPacote ::= SEQUENCE {
+    tipoPacote                             TipoPacote,
+    idPacote                               IDPacote,
+    nomepacote                             GeneralString,
+    versao                                 NumericString (SIZE(12)),                             -- shared string typedef @1913028, name unknown
+    abrangencia                            [1] Abrangencia OPTIONAL,
+    origem                                 Sistema
+}
+
+-- info @1141168; name: rtti+infoname (high)
+Foto ::= SEQUENCE {
+    formato                                FormatoImagem,
+    imagem                                 OCTET STRING
+}
+
+-- info @1141272; name: rtti+infoname (high)
+IDPacote ::= SEQUENCE {
+    idPacoteEleitoral                      IDEleitoral,
+    fase                                   Fase,
+    siglaUF                                [1] SiglaUF OPTIONAL,
+    codigoMunicipio                        [2] INTEGER (1..99999) OPTIONAL,
+    numeroZona                             [3] INTEGER (1..9999) OPTIONAL
+}
+
+-- info @1140828; name: rtti+infoname (high)
+IdentificacaoAbrangencia ::= SEQUENCE {
+    siglaUF                                SiglaUF,
+    codigoMunicipio                        INTEGER (1..99999) OPTIONAL
+}
+
+-- info @1140728; name: rtti+infoname (high)
+IdentificacaoContingencia ::= SEQUENCE {
+    municipioZona                          MunicipioZona
+}
+
+-- info @1140676; name: rtti+infoname (high)
+IdentificacaoSecaoEleitoral ::= SEQUENCE {
+    municipioZona                          MunicipioZona,
+    local                                  INTEGER (1..9999),                                    -- spec: NumeroLocal
+    secao                                  INTEGER (1..9999)                                     -- spec: NumeroSecao
+}
+
+-- info @1140384; name: rtti+infoname (high)
+MunicipioZona ::= SEQUENCE {
+    municipio                              INTEGER (1..99999),                                   -- spec: CodigoMunicipio
+    zona                                   INTEGER (1..9999)                                     -- spec: NumeroZona
+}
+
+-- info @1141080; name: rtti+infoname (high)
+Seguranca ::= SEQUENCE {
+    idTipoArquivo                          INTEGER (0..2),
+    idCriptografia                         INTEGER (1..3),
+    idArquivoCD                            INTEGER (0..255),
+    idArquivoChave                         OCTET STRING
+}
+
+-- info @1140332; name: rtti+infoname (high)
+UF ::= SEQUENCE {
+    sigla                                  SiglaUF,
+    nome                                   GeneralString (SIZE(1..35))
+}
+
+-- info @1141132; name: rtti (high)
+CodigoCargoConsulta ::= CHOICE {
+    cargoConstitucional                    [1] CargoConstitucional,
+    numeroCargoConsultaLivre               [2] INTEGER (25..99)                                  -- spec: NumeroCargoConsultaLivre
+}
+
+-- info @1140568; name: srcloc (high)
+IDEleitoral ::= CHOICE {
+    idProcessoEleitoral                    [1] INTEGER (0..99999),                               -- spec: IDProcessoEleitoral
+    idPleito                               [2] INTEGER (0..99999),                               -- spec: IDPleito
+    idEleicao                              [3] INTEGER (0..99999)                                -- spec: IDEleicao
+}
+
+-- info @1141324; name: spec (high); module: inferred from the types that use it
+IdentificacaoUrna ::= CHOICE {
+    identificacaoSecaoEleitoral            [0] IdentificacaoSecaoEleitoral,
+    identificacaoContingencia              [1] IdentificacaoContingencia
+}
+
+-- info @1140484; name: rtti (high)
+IdentificadorEleitor ::= CHOICE {
+    numeroInscricao                        [0] NumericString (SIZE(12)),
+    numeroCPF                              [1] NumericString (SIZE(11)),
+    identificacaoLivre                     [2] NumericString (SIZE(12))
+}
+
+-- info @1140436; name: spec (high); module: inferred from the types that use it
+CargoConstitucional ::= ENUMERATED {
+    presidente (1),
+    vicePresidente (2),
+    governador (3),
+    viceGovernador (4),
+    senador (5),
+    deputadoFederal (6),
+    deputadoEstadual (7),
+    deputadoDistrital (8),
+    primeiroSuplenteSenador (9),
+    segundoSuplenteSenador (10),
+    prefeito (11),
+    vicePrefeito (12),
+    vereador (13)
+}
+
+-- info @1140544; name: srcloc (high)
+CodigoSexo ::= ENUMERATED {
+    sexoNaoInformado (0),
+    sexoMasculino (2),
+    sexoFeminino (4)
+}
+
+-- info @1140604; name: rtti (high)
+Fase ::= ENUMERATED {
+    simulado (1),
+    oficial (2),
+    treinamento (3)
+}
+
+-- info @1140520; name: rtti (high)
+FormatoImagem ::= ENUMERATED {
+    formatoJPEG (1),
+    formatoBMP (2)
+}
+
+-- info @1140652; name: rtti (high)
+Sistema ::= ENUMERATED {
+    configurador (1),
+    intercad (2),
+    candidaturas (3),
+    gedai (6),
+    urnaEletronica (7),
+    simulador (8),
+    parametrizador (9),
+    geradorDeBases (10),
+    sistot (11),
+    seweb (12),
+    simon (13),
+    padaUE (14)
+}
+
+-- info @1140804; name: srcloc (high)
+TipoAbrangencia ::= ENUMERATED {
+    municipal (0),
+    estadual (1),
+    federal (2)
+}
+
+-- info @1140780; name: rtti (high)
+TipoCargoConsulta ::= ENUMERATED {
+    majoritario (1),
+    proporcional (2),
+    consulta (3)
+}
+
+-- info @1140932; name: rtti (high)
+TipoDedo ::= ENUMERATED {
+    naoIdentificado (0),
+    polegarDireito (1),
+    indicadorDireito (2),
+    medioDireito (3),
+    anelarDireito (4),
+    minimoDireito (5),
+    polegarEsquerdo (6),
+    indicadorEsquerdo (7),
+    medioEsquerdo (8),
+    anelarEsquerdo (9),
+    minimoEsquerdo (10)
+}
+
+-- info @1142284; name: inferred (low) <<< placeholder name, not in the binary; module: inferred from the types that use it
+TipoEleicao ::= ENUMERATED {
+    ordinaria (0),
+    extraordinaria (1),
+    consultaPopular (2)
+}
+
+-- info @1140460; name: rtti (high)
+TipoIdentificadorEleitor ::= ENUMERATED {
+    numeroInscricaoEleitoral (1),
+    numeroCPF (2),
+    numeroLivre (3)
+}
+
+-- info @1141008; name: inferred (low) <<< placeholder name, not in the binary; module: inferred from the types that use it
+TipoTransferenciaTemporaria ::= ENUMERATED {
+    votoEmTransito (1),
+    presoProvisorio (2),
+    servidorEmServico (3),
+    acessibilidade (4),
+    eleitorConvocado (5),
+    justicaEleitoral (6),
+    oficio (7),
+    indigenaQuilombola (8),
+    situacaoRua (9)
+}
+
+-- info @1140628; name: rtti (high)
+Turno ::= ENUMERATED {
+    semTurno (0),
+    turno1 (1),
+    turno2 (2)
+}
+
+-- info @1913292; name: rtti (high)
+DataHoraJE ::= GeneralString (SIZE(15))
+
+-- info @1913204; name: rtti (high)
+DataJE ::= NumericString (SIZE(8))
+
+-- info @1913248; name: rtti (high)
+HoraJE ::= NumericString (SIZE(6))
+-- NumericString info passed to the HoraJE constructor in func 1713
+
+-- info @1913072; name: rtti (high)
+SiglaUF ::= GeneralString (SIZE(2))
+
+END

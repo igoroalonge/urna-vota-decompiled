@@ -1,0 +1,63 @@
+-- ModuloTiposEcoUrna.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- Types of the 'ecourna' library layer: urna load record (Carga), media generator id, equipment models, voter identifiers.
+
+ModuloTiposEcoUrna DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+IMPORTS
+    DataHoraJE, IdentificadorEleitor
+        FROM ModuloTiposEleitorais;
+
+-- info @1146376; name: rtti+infoname (high)
+Carga ::= SEQUENCE {
+    numeroInternoUrna                      INTEGER (0..99999999),                                -- spec: NumeroInternoUrna
+    numeroSerieFC                          OCTET STRING (SIZE(4)),                               -- spec: NumeroSerieFlash
+    identificadorGeradorMidia              IdentificadorGeradorMidia,
+    dataHoraCarga                          DataHoraJE,
+    codigoCarga                            GeneralString
+}
+
+-- info @1146300; name: rtti+infoname (high)
+IdentificadorGeradorMidia ::= SEQUENCE {
+    nome                                   GeneralString,
+    serialCertificadoTPM                   GeneralString,
+    serialInstalacao                       GeneralString
+}
+
+-- info @1146248; name: rtti+infoname (high)
+RegistroIdentificacaoEleitor ::= SEQUENCE {
+    identificacaoUtilizada                 IdentificadorEleitor,
+    identificacaoPrincipal                 IdentificadorEleitor OPTIONAL
+}
+
+-- info @1146352; name: rtti (high)
+ModeloEquipamento ::= ENUMERATED {
+    tpm20 (2),
+    ue2013 (13),
+    ue2015 (15),
+    ue2020 (20),
+    ue2022 (22)
+}
+
+-- info @1146224; name: rtti (high)
+SituacaoArquivo ::= ENUMERATED {
+    arquivoFinal (1),
+    arquivoParcial (2)
+}
+
+END

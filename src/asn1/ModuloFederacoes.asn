@@ -1,0 +1,40 @@
+-- ModuloFederacoes.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- Party federations (federacoes partidarias), file *-fe.dat.
+
+ModuloFederacoes DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+IMPORTS
+    CabecalhoEntidade
+        FROM ModuloTiposEleitorais;
+
+-- info @1146148; name: rtti+infoname (high)
+EntidadeFederacoes ::= SEQUENCE {
+    cabecalho                              CabecalhoEntidade,
+    federacoes                             SEQUENCE OF Federacao OPTIONAL
+}
+
+-- info @1146096; name: rtti+infoname (high)
+Federacao ::= SEQUENCE {
+    identificador                          INTEGER (100..999),
+    sigla                                  GeneralString (SIZE(1..55)),
+    nome                                   GeneralString (SIZE(1..84)),
+    partidos                               SEQUENCE OF INTEGER (0..99)
+}
+
+END

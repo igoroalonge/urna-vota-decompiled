@@ -1,0 +1,133 @@
+-- ModuloParametrizacaoUrna.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- PU = parametrizacao da urna: report copies, time-outs, labels, report headers/footers, flags. *-pu.dat.
+
+ModuloParametrizacaoUrna DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+IMPORTS
+    CabecalhoEntidade
+        FROM ModuloTiposEleitorais;
+
+-- info @1139204; name: rtti+infoname (high)
+EntidadeParametrizacaoUrna ::= SEQUENCE {
+    cabecalho                              CabecalhoEntidade,
+    parametros                             ParametrosUrna
+}
+
+-- info @1139028; name: rtti+infoname (high)
+LabelParametrizado ::= SEQUENCE {
+    genero                                 GeneroLabel,
+    longo                                  GeneralString (SIZE(1..20)),
+    curto                                  GeneralString (SIZE(1..11)),
+    longoPlural                            GeneralString (SIZE(1..24)),
+    curtoPlural                            GeneralString (SIZE(1..13))
+}
+
+-- info @1139152; name: rtti+infoname (high)
+ParametrosUrna ::= SEQUENCE {
+    formaSuspensaoSemVoto                  FormaSuspenderSemVoto,
+    formaSuspensaoComVoto                  FormaSuspenderComVoto,
+    numZeresimas                           INTEGER (1..50),
+    numBUVotaObrigatorios                  INTEGER (1..50),
+    numBUVotaAdicionais                    INTEGER (1..50),
+    numBUFinalREDObrigat                   INTEGER (1..50),
+    numBUFinalREDAdic                      INTEGER (1..50),
+    numBUParcialREDObrigat                 INTEGER (1..50),
+    numBUParcialREDAdic                    INTEGER (1..50),
+    numBUFinalSAObrigat                    INTEGER (1..50),
+    numBUFinalSAAdic                       INTEGER (1..50),
+    numBUParcialSAObrigat                  INTEGER (1..50),
+    numTentativasHabilitacao               INTEGER (1..50),
+    numTentativasVerificacao               INTEGER (1..50),
+    numRelatorioEstado                     INTEGER (1..50),
+    numRelatorioEleitores                  INTEGER (1..50),
+    numRelatorioVersoesDados               INTEGER (1..50),
+    numRelatorioPU                         INTEGER (1..50),
+    criptografarBU                         BOOLEAN,
+    criptografarJUFA                       BOOLEAN,
+    numDigitosPartido                      INTEGER (1..5),
+    tempoDispararSuspensao                 INTEGER (15..360),
+    tempoDispararSuspensaoTE               INTEGER (15..360),
+    tempoConfirmacaoVoto                   INTEGER (0..99999),
+    tempoDesligamentoAutomatico            INTEGER (1..9999),
+    tempoAvisoDesligamentoAutomatico       INTEGER (1..9999),
+    cabecalho                              SEQUENCE OF TituloRelatorio,
+    rodapeZEVOTA                           SEQUENCE OF TituloRelatorio,
+    rodapeBUVOTA                           SEQUENCE OF TituloRelatorio,
+    rodapeZESA                             SEQUENCE OF TituloRelatorio,
+    rodapeBUSA                             SEQUENCE OF TituloRelatorio,
+    rodapeBUParcial                        SEQUENCE OF TituloRelatorio,
+    telaEmissaoBU                          GeneralString (SIZE(1..512)),
+    labelMunicipio                         LabelParametrizado,
+    labelZona                              LabelParametrizado,
+    labelSecao                             LabelParametrizado,
+    labelPartido                           LabelParametrizado,
+    imprimirZeradosBU                      BOOLEAN,
+    gravarZeradosBU                        BOOLEAN,
+    aceitarJustificativa                   BOOLEAN,
+    aceitarBrancoNulo                      BOOLEAN,
+    apresentarPartido                      BOOLEAN,
+    permitirHabManualAudio                 BOOLEAN,
+    imprimirQrCodeNoBU                     BOOLEAN,
+    exibirScoreBiometria                   BOOLEAN,
+    registrarMesarios                      BOOLEAN,
+    pedeAnoNascimentoEleitor               BOOLEAN
+}
+
+-- info @1138976; name: rtti+infoname (high)
+TituloRelatorio ::= SEQUENCE {
+    alinhamento                            AlinhamentoTitulo,
+    estilo                                 EstiloTitulo,
+    texto                                  GeneralString
+}
+
+-- info @1138904; name: srcloc (high)
+AlinhamentoTitulo ::= ENUMERATED {
+    esquerdo (1),
+    direito (2),
+    centro (3)
+}
+
+-- info @1138928; name: srcloc (high)
+EstiloTitulo ::= ENUMERATED {
+    normal (1),
+    expandido (2)
+}
+
+-- info @1138880; name: rtti (high)
+FormaSuspenderComVoto ::= ENUMERATED {
+    tornaOutrosBranco (1),
+    tornaOutrosNulo (2),
+    tornaNaoVotouParcial (3)
+}
+
+-- info @1138856; name: rtti (high)
+FormaSuspenderSemVoto ::= ENUMERATED {
+    tornaNaoVotou (1),
+    tornaTodosBranco (2),
+    tornaTodosNulo (3)
+}
+
+-- info @1138952; name: srcloc (high)
+GeneroLabel ::= ENUMERATED {
+    neutro (1),
+    masculino (2),
+    feminino (3)
+}
+
+END

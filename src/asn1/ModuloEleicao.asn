@@ -1,0 +1,112 @@
+-- ModuloEleicao.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- Definition of one eleicao: cargos and consulta-popular questions, digits, order, calendar. *-ce.dat.
+
+ModuloEleicao DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+IMPORTS
+    CabecalhoEntidade, CodigoCargoConsulta, DataJE, TipoAbrangencia, TipoCargoConsulta, TipoEleicao
+        FROM ModuloTiposEleitorais;
+
+-- info @1140280; name: rtti+infoname (high)
+EntidadeEleicao ::= SEQUENCE {
+    cabecalho                              CabecalhoEntidade,
+    idPleito                               INTEGER (0..99999),
+    idEleicaoPleito2                       [1] INTEGER (0..99999) OPTIONAL,
+    nome                                   GeneralString (SIZE(1..38)),
+    tipo                                   TipoEleicao,
+    anoReferencia                          INTEGER (2012..9999),
+    abrangencia                            TipoAbrangencia,
+    calendario                             [2] CalendarioEleicao OPTIONAL,
+    cargos                                 SEQUENCE OF CargoPergunta,
+    municipios                             SEQUENCE OF INTEGER (1..99999),
+    candidaturaDivulgavel                  BOOLEAN
+}
+
+-- info @1139656; name: infoname (high); module: inferred from the types that use it
+CalendarioEleicao ::= SEQUENCE {
+    dataInicioPropaganda                   DataJE,
+    dataFimPropaganda                      DataJE,
+    dataInicioRegistroCandidatura          [1] DataJE OPTIONAL,
+    dataFimRegistroCandidatura             [2] DataJE OPTIONAL,
+    dataInicioConvencaoPartidaria          [3] DataJE OPTIONAL,
+    dataFimConvencaoPartidaria             [4] DataJE OPTIONAL,
+    dataInicioPrestacaoConta               DataJE,
+    dataFimPrestacaoConta                  DataJE
+}
+
+-- info @1140140; name: infoname (high)
+CargoPergunta ::= SEQUENCE {
+    codigo                                 CodigoCargoConsulta,
+    tipo                                   TipoCargoConsulta,
+    numeroDigitos                          INTEGER (1..5),
+    qtdeEscolhas                           INTEGER (1..50),
+    podeRepetir                            BOOLEAN,
+    ordemAquisicao                         INTEGER (1..99),
+    ordemImpressao                         INTEGER (1..99),
+    ordemApuracao                          INTEGER (1..99),
+    paginaImpressaoVoto                    INTEGER (1..5),
+    detalhe                                DetalheCargoPergunta
+}
+
+-- info @1140028; name: infoname (high)
+DetalheCargo ::= SEQUENCE {
+    qtdeSuplentes                          INTEGER (0..2),
+    nomes                                  NomesCargo,
+    temFoto                                BOOLEAN,
+    suplencias                             SEQUENCE OF Suplencias OPTIONAL
+}
+
+-- info @1139844; name: infoname (high)
+DetalhePergunta ::= SEQUENCE {
+    nome                                   GeneralString (SIZE(1..36)),
+    pergunta                               GeneralString (SIZE(1..200)),
+    textoFonetico                          [1] GeneralString OPTIONAL,
+    respostas                              SEQUENCE OF RespostaPergunta
+}
+
+-- info @1139760; name: infoname (high)
+NomesCargo ::= SEQUENCE {
+    nomeNeutro                             GeneralString (SIZE(1..36)),
+    nomeMasculino                          GeneralString (SIZE(1..36)),
+    nomeFeminino                           GeneralString (SIZE(1..36)),
+    nomeAbreviado                          GeneralString (SIZE(1..10))
+}
+
+-- info @1139708; name: infoname (high); module: inferred from the types that use it
+RespostaPergunta ::= SEQUENCE {
+    numero                                 INTEGER (0..99999),
+    resposta                               GeneralString (SIZE(1..30)),
+    textoFonetico                          [1] GeneralString OPTIONAL
+}
+
+-- info @1139920; name: infoname (high)
+Suplencias ::= SEQUENCE {
+    codigo                                 CodigoCargoConsulta,
+    ordem                                  INTEGER (1..9),
+    nomes                                  NomesCargo,
+    temFoto                                BOOLEAN
+}
+
+-- info @1140080; name: inferred (low) <<< placeholder name, not in the binary; module: inferred from the types that use it
+DetalheCargoPergunta ::= CHOICE {
+    cargo                                  [0] DetalheCargo,
+    pergunta                               [1] DetalhePergunta
+}
+
+END

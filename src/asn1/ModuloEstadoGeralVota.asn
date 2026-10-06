@@ -1,0 +1,76 @@
+-- ModuloEstadoGeralVota.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- Persistent state of the VOTA application (vota.bin).
+
+ModuloEstadoGeralVota DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+IMPORTS
+    NumViasImpressasRelatorios
+        FROM ModuloEstadoGeralDefs
+    DataHoraJE
+        FROM ModuloTiposEleitorais;
+
+-- info @1145628; name: rtti+infoname (high)
+EstadoGeralVota ::= SEQUENCE {
+    estadoVota                             EstadoVota,
+    estadoEncerramento                     EstadoEncerramento,
+    qtdBU                                  INTEGER (0..999),
+    comparecimento                         INTEGER (0..99999),
+    qtdJustificativa                       INTEGER (0..99999),
+    treinamentoEleitor                     BOOLEAN,
+    numViasImpressasRelatorios             NumViasImpressasRelatorios,
+    tecladoTestadoPosConversao             BOOLEAN,
+    urnaIdGerouZeresima                    [1] EXPLICIT INTEGER (0..99999999) OPTIONAL,
+    dhIniAquisicao                         [2] EXPLICIT DataHoraJE OPTIONAL,
+    dhFimAquisicao                         [3] EXPLICIT DataHoraJE OPTIONAL,
+    dhUltimoVoto                           [4] EXPLICIT DataHoraJE OPTIONAL,
+    dhEmissao                              [5] EXPLICIT DataHoraJE OPTIONAL
+}
+
+-- info @1145604; name: rtti (high)
+EstadoEncerramento ::= ENUMERATED {
+    inicial (0),
+    imprimirobrigatoriabu (1),
+    retirarmr (2),
+    fimdostrabalhos (3),
+    ultimoid (4)
+}
+
+-- info @1145580; name: rtti (high)
+EstadoVota ::= ENUMERATED {
+    inicial (0),
+    gerabasedinamica (1),
+    aguardahorazeresima (2),
+    gerarze (3),
+    zeresimagerada (4),
+    zeresimaimpressa (5),
+    registromesarioinicial (6),
+    votar (7),
+    fimaquisicaovotos (8),
+    registromesariofinal (9),
+    gerarbu (10),
+    gerarrelatorios (11),
+    imprimirbu (12),
+    gravarresultados (13),
+    copiaresultadosmr (14),
+    encerrada (15),
+    exibealertadesligamento (16),
+    ultimoid (17)
+}
+
+END

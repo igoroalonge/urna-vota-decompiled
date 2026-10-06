@@ -1,0 +1,49 @@
+-- ModuloSituacoesEleicoes.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- Situation (ativa/suspensa/cancelada/excluida) and ordering of each eleicao. *-ste.dat.
+
+ModuloSituacoesEleicoes DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+IMPORTS
+    CabecalhoEntidade
+        FROM ModuloTiposEleitorais;
+
+-- info @1141732; name: rtti+infoname (high)
+EntidadeSituacoesEleicoes ::= SEQUENCE {
+    cabecalho                              CabecalhoEntidade,
+    situacoesEleicoes                      SEQUENCE OF SituacaoEleicao OPTIONAL
+}
+
+-- info @1141648; name: infoname (high); module: inferred from the types that use it
+SituacaoEleicao ::= SEQUENCE {
+    idEleicao                              INTEGER (0..99999),
+    tipo                                   TipoSituacaoEleicao,
+    ordemAquisicao                         INTEGER (1..99),
+    ordemImpressao                         INTEGER (1..99),
+    ordemApuracao                          INTEGER (1..99)
+}
+
+-- info @1141624; name: inferred (low) <<< placeholder name, not in the binary; module: inferred from the types that use it
+TipoSituacaoEleicao ::= ENUMERATED {
+    ativa (0),
+    suspensa (1),
+    cancelada (2),
+    excluida (3)
+}
+
+END

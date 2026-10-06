@@ -1,0 +1,106 @@
+-- ModuloRegistroDigitalVoto.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- RDV = Registro Digital do Voto: every vote as typed, per eleicao/cargo, without voter identity. Matches rdv.asn1 (v2, 2024).
+
+ModuloRegistroDigitalVoto DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+IMPORTS
+    CabecalhoEntidade, CodigoCargoConsulta, Fase, IdentificacaoSecaoEleitoral
+        FROM ModuloTiposEleitorais
+    Urna
+        FROM ModuloTiposResultadosEcoUrna;
+
+-- info @1143336; name: rtti+infoname (high)
+EntidadeRegistroDigitalVoto ::= SEQUENCE {
+    pleito                                 INTEGER (0..99999),                                   -- spec: IDPleito
+    fase                                   Fase,
+    identificacao                          IdentificacaoSecaoEleitoral,
+    historicoCodigosCarga                  SEQUENCE OF GeneralString,
+    eleicoes                               Eleicoes
+}
+
+-- info @1143388; name: rtti+infoname (high)
+EntidadeResultadoRDV ::= SEQUENCE {
+    cabecalho                              CabecalhoEntidade,
+    urna                                   Urna,
+    rdv                                    EntidadeRegistroDigitalVoto
+}
+
+-- info @1143184; name: infoname (high); module: inferred from the types that use it
+EleicaoSA ::= SEQUENCE {
+    idEleicao                              INTEGER (0..99999),                                   -- spec: IDEleicao
+    tipoCedulaSA                           TipoCedulaSA,
+    origemVotosSA                          OrigemVotosSA,
+    votosCargos                            SEQUENCE OF VotosCargo
+}
+
+-- info @1143132; name: rtti+infoname (high)
+EleicaoVota ::= SEQUENCE {
+    idEleicao                              INTEGER (0..99999),                                   -- spec: IDEleicao
+    votosCargos                            SEQUENCE OF VotosCargo
+}
+
+-- info @1142964; name: rtti+infoname (high)
+Voto ::= SEQUENCE {
+    tipoVoto                               TipoVoto,
+    digitacao                              VotoDigitado OPTIONAL
+}
+
+-- info @1143048; name: rtti+infoname (high)
+VotosCargo ::= SEQUENCE {
+    idCargo                                CodigoCargoConsulta,
+    quantidadeEscolhas                     INTEGER (1..50),                                      -- spec: QuantidadeEscolhas
+    votos                                  SEQUENCE OF Voto
+}
+
+-- info @1143300; name: rtti (high)
+Eleicoes ::= CHOICE {
+    eleicoesVota                           [1] SEQUENCE OF EleicaoVota,
+    eleicoesSA                             [2] SEQUENCE OF EleicaoSA
+}
+
+-- info @1142916; name: spec (high); module: inferred from the types that use it
+OrigemVotosSA ::= ENUMERATED {
+    cedula (1),
+    rdv (2),
+    bu (3)
+}
+
+-- info @1142892; name: spec (high); module: inferred from the types that use it
+TipoCedulaSA ::= ENUMERATED {
+    majoritario (1),
+    proporcional (2)
+}
+
+-- info @1142940; name: rtti (high)
+TipoVoto ::= ENUMERATED {
+    legenda (1),
+    nominal (2),
+    branco (3),
+    nulo (4),
+    brancoAposSuspensao (5),
+    nuloAposSuspensao (6),
+    nuloPorRepeticao (7),
+    nuloCargoSemCandidato (8),
+    nuloAposSuspensaoCargoSemCandidato (9)
+}
+
+-- info @1913644; name: rtti (high)
+VotoDigitado ::= NumericString (SIZE(1..5))
+
+END

@@ -1,0 +1,126 @@
+-- ModuloBoletimUrna.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- BU = Boletim de Urna, the per-section tally. Matches the TSE published bu.asn1 (v2, 2024) member by member.
+
+ModuloBoletimUrna DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+IMPORTS
+    CabecalhoEntidade, CodigoCargoConsulta, DataHoraJE, Fase, IdentificacaoSecaoEleitoral, TipoCargoConsulta
+        FROM ModuloTiposEleitorais
+    Urna
+        FROM ModuloTiposResultadosEcoUrna;
+
+-- info @1144144; name: rtti+infoname (high)
+EntidadeBoletimUrna ::= SEQUENCE {
+    cabecalho                              CabecalhoEntidade,
+    fase                                   Fase,
+    urna                                   Urna,
+    identificacaoSecao                     IdentificacaoSecaoEleitoral,
+    dataHoraEmissao                        DataHoraJE,
+    dadosSecaoSA                           DadosSecaoSA,
+    qtdEleitoresCompareceram               INTEGER (0..9999),                                    -- spec: QtdEleitores
+    detalhamentoComparecimento             [1] DetalhamentoComparecimento OPTIONAL,
+    resultadosVotacaoPorEleicao            SEQUENCE OF ResultadoVotacaoPorEleicao,
+    historicoCodigosCarga                  SEQUENCE OF GeneralString,
+    historicoVotoImpresso                  SEQUENCE OF HistoricoVotoImpresso OPTIONAL
+}
+
+-- info @1143796; name: rtti+infoname (high)
+DadosSA ::= SEQUENCE {
+    juntaApuradora                         INTEGER (0..9999),
+    turmaApuradora                         INTEGER (0..9999),
+    numeroInternoUrnaOrigem                INTEGER (0..99999999) OPTIONAL                        -- spec: NumeroInternoUrna
+}
+
+-- info @1143744; name: rtti+infoname (high)
+DadosSecao ::= SEQUENCE {
+    dataHoraAbertura                       DataHoraJE,
+    dataHoraEncerramento                   DataHoraJE,
+    dataHoraDesligamentoVotoImpresso       DataHoraJE OPTIONAL
+}
+
+-- info @1143616; name: rtti+infoname (high)
+DetalhamentoComparecimento ::= SEQUENCE {
+    qtdEleitoresCompareceramSemBiometria   INTEGER (0..9999),                                    -- spec: QtdEleitores
+    qtdEleitoresHabilitadosPorBiometria    INTEGER (0..9999),                                    -- spec: QtdEleitores
+    qtdEleitoresHabilitadosPorBiografia    INTEGER (0..9999)                                     -- spec: QtdEleitores
+}
+
+-- info @1143848; name: rtti+infoname (high)
+HistoricoVotoImpresso ::= SEQUENCE {
+    idImpressoraVotos                      INTEGER (0..99999999),
+    idRepositorioVotos                     INTEGER (0..99999999),
+    dataHoraLigamento                      DataHoraJE
+}
+
+-- info @1143668; name: rtti+infoname (high)
+IdentificacaoVotavel ::= SEQUENCE {
+    partido                                INTEGER (0..99),                                      -- spec: NumeroPartido
+    codigo                                 INTEGER (0..99999)                                    -- spec: NumeroVotavel
+}
+
+-- info @1144040; name: rtti+infoname (high)
+ResultadoVotacao ::= SEQUENCE {
+    tipoCargo                              TipoCargoConsulta,
+    qtdComparecimento                      INTEGER (0..9999),                                    -- spec: QtdEleitores
+    totaisVotosCargo                       SEQUENCE OF TotalVotosCargo
+}
+
+-- info @1144092; name: rtti+infoname (high)
+ResultadoVotacaoPorEleicao ::= SEQUENCE {
+    idEleicao                              INTEGER (0..99999),                                   -- spec: IDEleicao
+    qtdEleitoresAptos                      INTEGER (0..9999),                                    -- spec: QtdEleitores
+    qtdEleitoresAptosSecao                 INTEGER (0..9999),                                    -- spec: QtdEleitores
+    qtdEleitoresAptosTTE                   INTEGER (0..9999),                                    -- spec: QtdEleitores
+    resultadosVotacao                      SEQUENCE OF ResultadoVotacao,
+    ultimoHashVotosVotavel                 OCTET STRING,
+    assinaturaUltimoHashVotosVotavel       OCTET STRING
+}
+
+-- info @1143988; name: rtti+infoname (high)
+TotalVotosCargo ::= SEQUENCE {
+    codigoCargo                            CodigoCargoConsulta,
+    ordemImpressao                         INTEGER (1..99),
+    votosVotaveis                          SEQUENCE OF TotalVotosVotavel
+}
+
+-- info @1143900; name: rtti+infoname (high)
+TotalVotosVotavel ::= SEQUENCE {
+    tipoVoto                               [1] TipoVoto,
+    quantidadeVotos                        [2] INTEGER (0..9999),                                -- spec: QtdEleitores
+    identificacaoVotavel                   [3] IdentificacaoVotavel OPTIONAL,
+    ordemGeracaoHash                       INTEGER (0..9999),                                    -- spec: QtdEleitores
+    hash                                   OCTET STRING
+}
+
+-- info @1143952; name: spec (high); module: inferred from the types that use it
+DadosSecaoSA ::= CHOICE {
+    dadosSecao                             [0] DadosSecao,
+    dadosSA                                [1] DadosSA
+}
+
+-- info @1143720; name: srcloc (high)
+TipoVoto ::= ENUMERATED {
+    nominal (1),
+    branco (2),
+    nulo (3),
+    legenda (4),
+    cargoSemCandidato (5)
+}
+
+END

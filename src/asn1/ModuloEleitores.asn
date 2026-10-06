@@ -1,0 +1,106 @@
+-- ModuloEleitores.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- Section voter roll (cadastro de eleitores da secao), files *-el.dat and *-tte.dat.
+
+ModuloEleitores DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+IMPORTS
+    CabecalhoEntidade, DataJE, Foto, IdentificacaoSecaoEleitoral, IdentificadorEleitor, Seguranca, SiglaUF, TipoDedo, TipoTransferenciaTemporaria
+        FROM ModuloTiposEleitorais;
+
+-- info @1142232; name: rtti+infoname (high)
+EntidadeEleitores ::= SEQUENCE {
+    cabecalho                              CabecalhoEntidade,
+    identificacao                          IdentificacaoSecaoEleitoral,
+    seguranca                              [1] Seguranca OPTIONAL,
+    eleitores                              SEQUENCE OF EleitorSequencia OPTIONAL
+}
+
+-- info @1142044; name: rtti+infoname (high)
+BiometriaEleitor ::= SEQUENCE {
+    foto                                   [1] Foto OPTIONAL,
+    dedos                                  [2] SEQUENCE OF Dedo OPTIONAL
+}
+
+-- info @1141960; name: rtti+infoname (high)
+BiometriaEleitorCifrada ::= SEQUENCE {
+    composicaoBiometria                    ComposicaoBiometria,
+    conteudo                               OCTET STRING,
+    salt                                   OCTET STRING
+}
+
+-- info @1141908; name: rtti+infoname (high)
+Dedo ::= SEQUENCE {
+    tipo                                   TipoDedo,
+    qtdMinucias                            INTEGER,
+    minucias                               OCTET STRING
+}
+
+-- info @1143488; name: infoname (high); module: inferred from the types that use it
+DomicilioEleitoral ::= SEQUENCE {
+    uf                                     SiglaUF,
+    zona                                   INTEGER (1..9999),
+    secao                                  INTEGER (1..9999),
+    dataNaUF                               DataJE,
+    dataNoMunicipio                        DataJE,
+    codigoMunicipio                        INTEGER (1..99999)
+}
+
+-- info @1142148; name: infoname (high)
+EleitorSequencia ::= SEQUENCE {
+    sequencial                             INTEGER (0..9999),
+    eleitor                                EleitorUrna,
+    tipoTransferenciaTemporaria            [1] TipoTransferenciaTemporaria OPTIONAL
+}
+
+-- info @1142096; name: infoname (high)
+EleitorUrna ::= SEQUENCE {
+    identificacaoEleitor                   SEQUENCE OF IdentificadorEleitor,
+    nome                                   GeneralString (SIZE(1..70)),
+    nomeSocial                             [1] GeneralString (SIZE(1..70)) OPTIONAL,
+    nomeMae                                GeneralString (SIZE(1..70)),
+    dataNascimento                         DataJE,
+    situacao                               SituacaoEleitor,
+    domicilio                              [2] DomicilioEleitoral OPTIONAL,
+    necessidade                            NecessidadeEspecial,
+    biometria                              BiometriaEleitorCifrada OPTIONAL
+}
+
+-- info @1141884; name: inferred (low) <<< placeholder name, not in the binary; module: inferred from the types that use it
+ComposicaoBiometria ::= ENUMERATED {
+    foto (1),
+    dedos (2),
+    fotoDedos (3)
+}
+
+-- info @1141860; name: rtti-struct (high)
+NecessidadeEspecial ::= ENUMERATED {
+    semNecessidade (1),
+    necessitaAudio (2)
+}
+
+-- info @1143464; name: inferred (low) <<< placeholder name, not in the binary; module: inferred from the types that use it
+SituacaoEleitor ::= ENUMERATED {
+    regular (0),
+    cancelado (4),
+    suspenso (6),
+    envolvidoEmCoincidenciaNaoLiberado (7),
+    envolvidoEmCoincidenciaLiberado (9)
+}
+
+END

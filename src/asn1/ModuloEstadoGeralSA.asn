@@ -1,0 +1,64 @@
+-- ModuloEstadoGeralSA.asn
+-- Reconstructed from vota_web_wasm.wasm (TSE voting-simulator build of VOTA, "10.23.0.1 - DESENVOLVIMENTO")
+-- by reading the III ASN.1 runtime tables (SEQUENCE/CHOICE/ENUMERATED InfoType structs) in linear memory.
+-- See docs/data-model/asn1-schemas.md for the method and for what each module means.
+--
+-- Confidence:
+--  * member names, order, OPTIONAL, tags, INTEGER ranges, SIZE constraints, ENUMERATED names and
+--    numbers: HIGH (read directly from the tables the encoder/decoder uses);
+--  * type names: see the 'info @addr; name: <source>' comment above each definition:
+--      infoname = the name string TSE added to every SEQUENCE InfoType (+48), rtti = C++ class
+--      name (typeinfo) bound to the table, srcloc = name found in a source_location signature,
+--      spec = name used by the TSE published spec for an identical type, inferred = placeholder;
+--  * the module header (IMPLICIT TAGS) and the IMPORTS lists are reconstructed, not read;
+--  * constrained INTEGER typedef names (QtdEleitores, NumeroZona...) do not exist in the binary
+--    (III ASN.1 turns them into shared C++ template instances), so ranges are written inline;
+--    when the TSE published spec (v2, 2024) names the type of a field we add a 'spec: Name' comment.
+
+-- Persistent state of the Sistema de Apuracao application (sa.bin).
+
+ModuloEstadoGeralSA DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+-- info @1146812; name: rtti+infoname (high)
+EstadoGeralSA ::= SEQUENCE {
+    estadoSA                               EstadoSA,
+    atualizacaoBloqueada                   BOOLEAN,
+    dadosSecao                             DadoSecaoSA
+}
+
+-- info @1146736; name: infoname (high); module: inferred from the types that use it
+DadoSecaoSA ::= SEQUENCE {
+    municipio                              INTEGER (0..99999),
+    zona                                   INTEGER (0..9999),
+    secao                                  INTEGER (0..9999)
+}
+
+-- info @1146788; name: rtti (high)
+EstadoSA ::= ENUMERATED {
+    inicial (0),
+    arvoreraizpreparada (1),
+    preparada (2),
+    imprimirZEsecao (3),
+    iniciarapuracao (4),
+    apurarmajoritaria (5),
+    majoritariacompleta (6),
+    majoritariaencerrada (7),
+    apurarproporcional (8),
+    proporcionalcompleta (9),
+    proporcionalencerrada (10),
+    buiniciacargo (11),
+    buproporcionalpedepartido (12),
+    buproporcionalpedecandidato (13),
+    bumajoritariapedecandidato (14),
+    buregistrabunordv (15),
+    posicionarmista (16),
+    gravarbu (17),
+    imprimirbu (18),
+    gravaresultado (19),
+    copiaresultadomr (20),
+    imprimiradicionalbu (21),
+    encerrada (22),
+    ultimoid (23)
+}
+
+END
