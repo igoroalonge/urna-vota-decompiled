@@ -1,0 +1,194 @@
+{
+ "name": "investigation/scripts",
+ "description": "Reproducible checks of the reconstructed VOTA code (src/) against public 2026 TSE data: hash listings, real urna result files (bu.dat, rdv.dat, *.vsc, *-log.jez).",
+ "requirements": {
+  "python": ">= 3.9",
+  "pip": [
+   "asn1tools",
+   "cryptography"
+  ],
+  "notes": "Run every script with `python3 -I`. hashlists.py, fetch_sections.py, fetch_open_data.py and log_templates.py need the standard library only. Ed521 (EdDSA on E-521) is implemented in sigtools.py; no third-party EdDSA library (e.g. ECPy) is needed."
+ },
+ "data_privacy": "Raw *-log.jez / logd.dat contain poll workers' títulos eleitorais in clear text, and GEDAI log bundles contain staff user numbers and computer names: never commit raw logs or anything extracted from them. The scripts print counts and templates only and mask 10-12 digit runs.",
+ "files": [
+  {
+   "file": "fetch_sections.py",
+   "track": "data",
+   "purpose": "Download per-section 2026 urna files (aux.json, *-bu.dat, *-rdv.dat, *-log.jez, *-vota.vsc) from resultados.tse.jus.br with browser-like headers; random sample per UF with a seed, or explicit sections.",
+   "usage": "python3 -I fetch_sections.py --out data/sections sample --per-uf 4 --seed 1 ac df sp zz | python3 -I fetch_sections.py --out data/sections sections ac-01074-0004-0042 [--types bu,rdv,vota,log]",
+   "inputs": [
+    "network: resultados.tse.jus.br/oficial/ele2026/arquivo-urna/3220/..."
+   ],
+   "outputs": [
+    "<out>/<uf>-<mun>-<zona>-<secao>/aux.json",
+    "<out>/<section>/<hash16>/<files>",
+    "<out>/_config/<uf>-p003220-cs.json"
+   ],
+   "reproduces": [
+    "data: 'sample --per-uf 4 --seed 2026' over the 28 UFs (ac al am ap ba ce df es go ma mg ms mt pa pb pe pi pr rj rn ro rr rs sc se sp to zz) selects 112 sections; 106 of them form the investigation's 110-section sample (6 have no published files: HTTP 404), the other 4 were added with 'sections' (ac-01074-0004-0042 zz-29416-0001-0824 zz-29599-0001-1411 zz-30627-0001-1785)"
+   ]
+  },
+  {
+   "file": "fetch_open_data.py",
+   "track": "data",
+   "purpose": "Search, list and download TSE open-data resources via the CKAN API of dadosabertos.tse.jus.br, filtered by dataset name, UF and regex; checks downloads against the published .sha512.",
+   "usage": "python3 -I fetch_open_data.py search \"boletim de urna 2026\" | list resultados-2026-boletim-de-urna --uf AC | get resultados-2026-boletim-de-urna --uf AC --out data/cdn",
+   "inputs": [
+    "network: dadosabertos.tse.jus.br/api/3/action/{package_search,package_show}",
+    "cdn.tse.jus.br resources"
+   ],
+   "outputs": [
+    "downloaded resource files under --out"
+   ],
+   "reproduces": []
+  },
+  {
+   "file": "hashlists.py",
+   "track": "A",
+   "purpose": "Convert TSE 'Resumos digitais (hashes)' HTML pages (or their zips) to TSV; recompute every HASH GERAL with CMontadorHash::CalculaHashGeral (base files in listed order, then the UF key files); check the directory-walk order; print the per-model inventory diff and the per-UF key-file variability; optional comparison with plain-text copies.",
+   "usage": "python3 -I hashlists.py HASH_HTML_DIR_OR_ZIP... [--tsv-out OUT_DIR] [--compare-txt TXT_DIR]",
+   "inputs": [
+    "path1u13/u15/u20/u22.html, pc1*.html, itnm1*.html, HASH_*.html"
+   ],
+   "outputs": [
+    "stdout report",
+    "<tsv-out>/<list>.tsv (list, group, kind, path, sha512_b64)"
+   ],
+   "reproduces": [
+    "A1: HASH GERAL = code's chain, 10/10 PC/other lists and 112/112 per-UF urna values",
+    "A1: urna base-file order = CriaHashesDiretorio walk; key files sorted",
+    "A2: 173 base paths in the union, 123 identical in all four models (UE2013 135, UE2015 136, UE2020 140, UE2022 140 files)",
+    "A4: 17 key files per UF identical across models; 11 differ per UF, 6 identical in every UF and equal to Holocron chaves\\legal\\o*.ber.pub"
+   ]
+  },
+  {
+   "file": "roundtrip_asn1.py",
+   "track": "B",
+   "purpose": "Decode and re-encode bu.dat (EntidadeEnvelopeGenerico -> EntidadeBoletimUrna) and rdv.dat (bare EntidadeResultadoRDV) with src/asn1 and compare bytes.",
+   "usage": "python3 -I roundtrip_asn1.py data/sections [--repo REPO] [--verbose]",
+   "inputs": [
+    "*-bu.dat, *-busa.dat, *-rdv.dat",
+    "<repo>/src/asn1/*.asn"
+   ],
+   "outputs": [
+    "stdout totals; exit 1 on any failure"
+   ],
+   "reproduces": [
+    "B1: 110/110 BU envelopes and inner BUs and 110/110 RDVs re-encode byte for byte; 0 RDVs decode as an envelope (25/25 more on track B's special sections)"
+   ]
+  },
+  {
+   "file": "assinatura2026_inferred.asn",
+   "track": "B/H",
+   "purpose": "Our inferred ASN.1 layout of the 2026 *-vota.vsc signature files (own names; trailing urna-model/algorithm block, [0]/[1]-tagged key information). Not a TSE document.",
+   "usage": "used by vsc2026.py and qr_rebuild.py",
+   "inputs": [],
+   "outputs": [],
+   "reproduces": [
+    "B: 2026 .vsc layout re-encodes 110/110 byte for byte"
+   ]
+  },
+  {
+   "file": "sigtools.py",
+   "track": "B/H",
+   "purpose": "Minimal DER/X.509 reader, pure-Python Ed521 (EdDSA on E-521, SHAKE256, 'SigEd521' prefix) verification, ECDSA P-521/SHA-512 via cryptography, and the urna's signing convention (signature over SHA-512 of the value).",
+   "usage": "library (imported by vsc2026.py)",
+   "inputs": [],
+   "outputs": [],
+   "reproduces": []
+  },
+  {
+   "file": "vsc2026.py",
+   "track": "B/H",
+   "purpose": "Decode every *-vota.vsc with the inferred layout, round-trip it, print model / algorithms / signers / key-set label / certificate kind, check published files' SHA-512 and sizes, the lists' own digests, and verify the hardware signatures (files, list, BU election signatures) with the urna certificate; optional chain check against CA certificates given with --roots. The CEPESC software signature is not verifiable.",
+   "usage": "python3 -I vsc2026.py data/sections [--repo REPO] [--roots TSE_CA.pem] [--verbose]",
+   "inputs": [
+    "*-vota.vsc and the bu.dat/rdv.dat/log.jez next to it",
+    "<repo>/src/asn1 (for the BU signatures)",
+    "optional PEM with AC UE2020 / AC UE2022 / AC URNA certificates"
+   ],
+   "outputs": [
+    "stdout pass/fail table and inventory; exit 1 on any failure"
+   ],
+   "reproduces": [
+    "B/H: models UE2020 47, UE2022 44, UE2015 14, UE2013 5; trailing value = hardware algorithm (eddsa 4 on UE2020/22, ecdsa 2 on UE2013/15) 110/110",
+    "B: 1,001 Ed521 + 197 ECDSA file signatures, 110 list signatures and 216 BU election signatures verify over SHA-512(value); 0/216 over the raw last hash",
+    "B/H: urna certificates (PEM Ed521 on UE2020/22, DER ECDSA on UE2013/15) chain to AC UE2020 / AC UE2022 / AC URNA (110/110 with --roots)"
+   ]
+  },
+  {
+   "file": "bu_vs_rdv.py",
+   "track": "B",
+   "purpose": "Recompute the BU tuple hash chain (cconversorentidadebu.cpp formats) and the BU vote lines of every office from the RDV (ConverteTipoVoto table @546352), plus count and order rules.",
+   "usage": "python3 -I bu_vs_rdv.py data/sections [--repo REPO] [--verbose]",
+   "inputs": [
+    "*-bu.dat (+ *-rdv.dat in the same directory)",
+    "<repo>/src/asn1"
+   ],
+   "outputs": [
+    "stdout pass/fail table; exit 1 on any failure"
+   ],
+   "reproduces": [
+    "B: hash chain 216/216 elections, 13,088 tuples; 534/534 office blocks recomputed exactly from the RDV; 0 failures"
+   ]
+  },
+  {
+   "file": "log_templates.py",
+   "track": "C",
+   "purpose": "Read logd.dat from each *-log.jez in memory, normalise messages into fine/coarse templates per program, map templates to src/ string literals (exact / std::format / composed) and list those not found. Prints templates only; masks 10-12 digit runs and the media-generation computer/user values.",
+   "usage": "python3 -I log_templates.py data/sections [--repo REPO] [--tsv templates.tsv] [--all]",
+   "inputs": [
+    "*-log.jez",
+    "<repo>/src"
+   ],
+   "outputs": [
+    "stdout summary",
+    "optional masked TSV of all templates with source locations"
+   ],
+   "reproduces": [
+    "C1: 622,567 lines (VOTA 566,963; GAP 33,538; ATUE 10,260; SCUE 9,329; LOGD 2,214; INITJE 263); VOTA 191 coarse templates = 86 exact + 92 format + 5 composed + 8 NOT FOUND"
+   ]
+  },
+  {
+   "file": "qr_rebuild.py",
+   "track": "H",
+   "purpose": "Rebuild the 2026 BU QR texts (VRQR 6.0, 823-character parts, chained SHA-512, ASSI) and the certificate QR codes from bu.dat and the .vsc with the rules of cgeradorbuqrcode.u04-fragment.cpp / cgerabu.cpp, and report their lengths. PROC/VERC/DTPL/TURN are placeholders.",
+   "usage": "python3 -I qr_rebuild.py data/sections [--repo REPO] [--print-texts]",
+   "inputs": [
+    "*-bu.dat and *-vota.vsc",
+    "<repo>/src/asn1"
+   ],
+   "outputs": [
+    "stdout per-section QR counts and lengths, totals"
+   ],
+   "reproduces": [
+    "H5/G8: (BU QR, certificate QR) = {(1,2):4,(2,2):9,(3,2):70,(4,2):26,(5,2):1}; last QR > 1,100 characters in 13/110 BUs (1,102-1,239); certificate QR 1,071 (PEM) / 983 (DER) characters"
+   ]
+  },
+  {
+   "file": "kitlib.py",
+   "track": "-",
+   "purpose": "Shared helpers: repository root (Path(__file__).resolve().parents[2]), ASN.1 compilation, file discovery, masking of 10-12 digit runs.",
+   "usage": "library",
+   "inputs": [],
+   "outputs": [],
+   "reproduces": []
+  },
+  {
+   "file": "run_all.sh",
+   "track": "-",
+   "purpose": "Run all offline checks on downloaded data and print a summary.",
+   "usage": "PYTHON=python3 sh run_all.sh SECTIONS_DIR HASH_HTML_DIR [OUT_DIR]   (set REPO=... if the kit is not inside <repo>/investigation/scripts)",
+   "inputs": [
+    "sections directory",
+    "hash-list HTML directory"
+   ],
+   "outputs": [
+    "OUT_DIR/*.out, OUT_DIR/hashlists-tsv/, OUT_DIR/log_templates.tsv"
+   ],
+   "reproduces": [
+    "all of the above"
+   ]
+  }
+ ]
+}

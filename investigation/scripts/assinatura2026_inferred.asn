@@ -1,0 +1,79 @@
+-- assinatura2026_inferred.asn
+--
+-- Layout of the 2026 urna signature files (*-vota.vsc), INFERRED by this investigation from the
+-- bytes of the real files published on resultados.tse.jus.br (110 random 2026 1st-round sections,
+-- plus 25 contingency/SA/RED sections). It is not a TSE document; the type and field names are ours.
+-- Where a field corresponds to one of the urna code / TSE's 2024 published description, the comment
+-- says which. Checked by vsc2026.py: every real file decodes and re-encodes byte for byte.
+--
+-- Differences from the 2024 published layout, as seen in the bytes:
+--   * the urna model is no longer the first field of the file; the file ends with a third
+--     SEQUENCE of two ENUMERATED values: the urna model and the hardware signature algorithm
+--     (2 = ECDSA on UE2013/UE2015, 4 = EdDSA on UE2020/UE2022, in every real file);
+--   * the key information that ends each signature block carries a context tag: [0] for the
+--     key-set label (software block), [1] for the X.509 certificate (hardware block). No real file
+--     has both in one block, so they are modelled as a CHOICE.
+
+UrnaSignatureFile2026 DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+VscFile ::= SEQUENCE {
+    softwareBlock   SignatureBlock,      -- signed by the software key (signer "SEVIN", algorithm 3)
+    hardwareBlock   SignatureBlock,      -- signed by the urna's own key (signer "UEAO", serial = urna number)
+    hardwareOrigin  HardwareOrigin
+}
+
+HardwareOrigin ::= SEQUENCE {
+    urnaModel       UrnaModel,
+    hwAlgorithm     SignatureAlgorithmId
+}
+
+SignatureBlock ::= SEQUENCE {
+    createdAt       GeneralString (SIZE(15)),   -- local date-time, YYYYMMDDThhmmss
+    formatVersion   INTEGER,                    -- 2 in every 2026 file
+    selfSignature   ListSignature,              -- signature over `signedList`
+    signedList      OCTET STRING,               -- BER encoding of a SignedFileList
+    keyInfo         KeyInfo
+}
+
+KeyInfo ::= CHOICE {
+    keySetLabel     [0] GeneralString,          -- software block (a 12-character date-like label)
+    certificate     [1] OCTET STRING            -- hardware block: X.509, PEM (UE2020/22) or DER (UE2013/15)
+}
+
+ListSignature ::= SEQUENCE {
+    signer          SignerId,
+    hashAlgorithm   SEQUENCE { id HashAlgorithmId },
+    sigAlgorithm    SEQUENCE { id SignatureAlgorithmId, keyBits INTEGER },
+    value           FileSignature
+}
+
+SignerId ::= SEQUENCE {
+    name            GeneralString,
+    serial          INTEGER
+}
+
+SignedFileList ::= SEQUENCE {
+    files           SEQUENCE OF SignedFile      -- in the order the urna wrote the result files
+}
+
+SignedFile ::= SEQUENCE {
+    fileName        GeneralString,
+    signature       FileSignature
+}
+
+FileSignature ::= SEQUENCE {
+    size            INTEGER,                    -- byte length of the signed content
+    digest          OCTET STRING,               -- SHA-512 of the signed content
+    value           OCTET STRING                -- the signature
+}
+
+SignatureAlgorithmId ::= ENUMERATED { rsa (1), ecdsa (2), cepesc (3), eddsa (4) }
+
+HashAlgorithmId ::= ENUMERATED { sha1 (1), sha256 (2), sha384 (3), sha512 (4) }
+
+UrnaModel ::= ENUMERATED {
+    tpm12 (1), tpm20 (2), ue2009 (9), ue2010 (10), ue2011 (11), ue2013 (13), ue2015 (15),
+    ue2020 (20), ue2022 (22)
+}
+
+END

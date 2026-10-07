@@ -25,6 +25,7 @@ module behind the voting simulator that the Brazilian Electoral Court (TSE) publ
 | `docs_en/modules/` | one chapter per reconstruction unit (41), each ending in a function → symbol → file table; start at `docs_en/modules/README.md` |
 | `docs_en/data-model/asn1-schemas.md` | how the ASN.1 modules were recovered, and what each one describes |
 | `docs_en/glossary.md` | Portuguese and TSE terms |
+| `investigation/` | the October 2026 investigation: this reconstruction checked against the files real urnas wrote in the 2026 election and against TSE's public documents, with the scripts that reproduce it; start at `investigation/README.md` |
 
 1,184 C++ files, 83,183 lines. The file paths are the original ones, recovered from the binary.
 The module contains 3,463 TSE functions. All of them are reconstructed here except 4 trivial ones:

@@ -25,6 +25,7 @@ WebAssembly por trás do simulador de votação que o Tribunal Superior Eleitora
 | `docs/modules/` | um capítulo por unidade de reconstrução (41), cada um terminando com a tabela função → símbolo → arquivo; comece por `docs/modules/README.md` |
 | `docs/data-model/asn1-schemas.md` | como os módulos ASN.1 foram recuperados e o que cada um descreve |
 | `docs/glossary.md` | termos em português e do TSE |
+| `investigation/` | a investigação de outubro de 2026: esta reconstrução conferida contra os arquivos que as urnas reais gravaram na eleição de 2026 e contra os documentos públicos do TSE, com os scripts que a reproduzem; comece por `investigation/LEIAME.md` |
 
 São 1.184 arquivos C++ e 83.183 linhas. Os caminhos dos arquivos são os originais, recuperados do
 binário. O módulo tem 3.463 funções do TSE, e todas estão reconstruídas aqui, menos 4 triviais: três
