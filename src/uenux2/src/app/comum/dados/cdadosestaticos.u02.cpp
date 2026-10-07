@@ -117,7 +117,10 @@ CEleitores::~CEleitores() = default;
 // wasm func 1594: std::__tree<set<T>>::destroy(node) for a trivially destructible T.
 
 // wasm func 3745                                                       // name inferred
-// Name of a per-section voter file: "<fase><pleito><uf><município><zona><seção>-el.dat".
+// Name of a per-section voter file: "<fase><processo eleitoral><uf><município><zona><seção>-el.dat".
+// id.pleito (here and in NomeArquivoTTE) holds the processo eleitoral id (idPE), not the pleito: real
+// 2026 -el/-tte names carry 01219, result files the pleito 03220 (2026 urna data: investigation/README.md,
+// finding E11).
 std::string CEleitores::NomeArquivoEleitores(const SIdentificacaoCarga& id, TMunicipioID municipio,
                                              TZonaID zona, TSecaoID secao)
 {

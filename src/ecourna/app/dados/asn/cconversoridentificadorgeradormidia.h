@@ -17,8 +17,12 @@ namespace ecourna::app::dados::asn {
 // comum::asn::CConversorDadoCorrespondencia 11400, the caller seen at run time).
 //   IdentificadorGeradorMidia ::= SEQUENCE { nome GeneralString, serialCertificadoTPM GeneralString,
 //                                           serialInstalacao GeneralString }
-// "Gerador de mídia" = the machine/program that generated the urna's flash card. In the simulator data:
-// nome "simulador-votacao-ng", serialCertificadoTPM = 64 '0'.
+// "Gerador de mídia" = the computer that generated the medium (on real urnas a GEDAI-UE PC; the BU's Carga holds
+// the one that made the load medium). In the simulator, the eg.bin correspondence (so the BU) carries nome
+// "nome_maquina", serialCertificadoTPM "12345678", serialInstalacao "99999999" (func 9952); "simulador-votacao-ng",
+// 64 '0' and "A1B2C3DA" are the infomidia-fv-*-t.dat fixture's. Real values: nome Z<UF><zona:3>STD<2-3 digits>,
+// the TPM's EK-certificate serial in 8/20/32/40 hex, an 8-hex installation serial (2026 urna data:
+// investigation/README.md, findings E2, E3, E4, E5).
 class CConversorIdentificadorGeradorMidia
     : public api::asn::IConversorASN<ModuloTiposEcoUrna::IdentificadorGeradorMidia, CIdentificadorGeradorMidia>
 {

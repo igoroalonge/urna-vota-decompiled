@@ -351,11 +351,14 @@ encoded (`comum::asn::CConversorEstadoGeral::DesconverteEstadoUrna` 11398 / `Con
 
 | file read | chain observed |
 |---|---|
-| `-pu.dat` (national + UF) | 7787 → **9171** → 2665 → **1167** → 9218; 9171 → **9029**; 9171 → 9156 → 5102 → **9153**; 9156 → **9154** |
+| `-pu.dat` (national + UF; real media: national only, see below) | 7787 → **9171** → 2665 → **1167** → 9218; 9171 → **9029**; 9171 → 9156 → 5102 → **9153**; 9156 → **9154** |
 | `-cfm.dat` | 7787 → **9137** → 2665; **9136** → 1167 → **9142**; 9134; 9028 |
 | `-fe.dat` | 7787 → **9207** → 2665 (the list is absent) |
 | general state, `DadoCorrespondencia` (`CConversorDadoCorrespondencia`, u21) | 11397 → 5691 → 1563 → 11399 → **3734** → **6031**; 11398 → 5692 → 1008 → 11400 → **3733** → **6032** → 9224 |
 | `-fo.dat` photo | 3755 → **11440** → **5708** → 6032 → 9226 |
+
+In the simulator 7787 reads the national and the UF-level `-pu.dat`. Real 2026 and 2024 media carry only the national
+`o00000br-pu`; how 7787 handles the missing UF-level file is open (2026 urna data: investigation/README.md, finding E13).
 
 No `1900`/`1902` error is raised in the recorded sessions. The attendance converters (§5.1) did not run: they belong
 to the end-of-day flow.

@@ -393,9 +393,12 @@ na primeira vez em que `GetQRDSInst()` é executada:
      (5622)
 7. `CGeradorBUQRCodeVota(cabecalho, comparecimento, dhEmissao)` (func 5603). Depois,
    **`GeraQRCodes(2500)`** (func 5604). O BU impresso (`CGeraBU`, func 12110) usa exatamente o mesmo cabeçalho
-   e gerador com **1100**. Os QR codes de tela, portanto, contêm no máximo 2500 caracteres cada (fatias de
-   2500 − 277 = 2223 caracteres de payload, se a reserva de 277 caracteres descrita em `docs/bu/qrcode.md` §4
-   se aplicar), então um BU precisa de menos códigos, mais densos, na tela do que no papel. O resultado é
+   e gerador com **1100**. Os QR codes de tela, portanto, levam fatias de 2500 − 277 = 2223 caracteres de payload
+   (a reserva de 277 caracteres descrita em `docs/bu/qrcode.md` §4), então um BU precisa de menos códigos, mais
+   densos, na tela do que no papel. Todos os códigos, menos o último, contêm no máximo 2500 caracteres; o último pode
+   chegar a cerca de 2659 (1245 com Ed521 ou 1259 com ECDSA no papel), porque no formato 6.0 sua parte fixa (cabeçalho,
+   ` HASH:`, ` ASSI:`) ocupa 422–436 caracteres, mais que os 277 reservados (dados das urnas de 2026:
+   `investigation/LEIAME.md`, achado H5). O resultado é
    `{vector<string> conteudos, string assinatura}`. A string de assinatura é descartada, porque o campo `ASSI:`
    já está dentro do último payload.
 8. `IQRCodeBUDS(partes)` (vtable @1542092): `{vector<string> m_qrcodes (+4), size_t m_indice = 0 (+16)}`.

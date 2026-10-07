@@ -119,15 +119,17 @@ void CPerguntaCodigoSuspensao::ProcessInput()
     const std::string doEleitor = comum::md::CEleitorIdentidade::Formata(IdentidadeDigitada(), 1);  // 3623
     const bool valido = comum::md::CValidadorIdentidade::GetInst().EhValida(1 /*título*/, titulo)   // vota_f2803
                         && titulo != doEleitor;
+    // Both results are logged at severity 2 (LogaAviso): all 29 such lines on real urnas are ALERTA
+    // (2026 urna data: investigation/README.md, finding C3).
     if (!valido) {
-        CLogVota::GetInst().Loga(std::format("Título {} é inválido para suspender a votação", titulo));   // api_f1398
+        CLogVota::GetInst().LogaAviso(std::format("Título {} é inválido para suspender a votação", titulo));   // api_f1398
         m_telaErro->Show();                                                // +20, vtable slot 2
         api::CSystem::Sleep(3000);   // compiled as: if (byte @1584624 == 1) emscripten_sleep(3000)
                                      // -> ABORTS in this build (no Asyncify); unreachable in the simulator
         m_form->Show();                                                    // +12, IForm slot 2 (redraw)
         return;
     }
-    CLogVota::GetInst().Loga(std::format("Título {} é válido para suspender a votação", titulo));
+    CLogVota::GetInst().LogaAviso(std::format("Título {} é válido para suspender a votação", titulo));   // severity 2
     CThreadEleitor::GetInst().Fila().Push(api::SMessage{2}, 1);            // suspend the voter's session
     m_suspensaoEnviada = true;
 }

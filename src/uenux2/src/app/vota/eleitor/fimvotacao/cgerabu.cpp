@@ -249,6 +249,8 @@ void AddNomeCargo(api::CPaperFormBuilder& b, const CPadDS<CToUpperDS<CCargoDSNom
 std::vector<std::vector<std::pair<std::string, std::string>>>
 MontaQRCodesCertificado(const md::estadoaplicacao::CEstadoGeral& estado, bool dividir)
 {
+    // Despite the name `der`, the token returns the certificate as a 1,034-byte PEM text on UE2020/2022,
+    // and DER only on UE2013/2015 (2026 urna data: investigation/README.md, finding H3).
     const std::vector<uebyte> der = md::estadoaplicacao::CEstadoGeral::RecuperarCertificado();   // func 5635
     const std::string texto = api::CStringUtils::ToHex(der);                                      // func 1243
     unsigned partes = 1;

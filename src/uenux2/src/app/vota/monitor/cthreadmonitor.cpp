@@ -203,6 +203,10 @@ void CThreadMonitor::SaiPorVotacaoSuspensa()
     // In this build std::async cannot create a thread: the compiler reduced the call to
     // "allocate the shared state + std::__thread_struct (func 2541) + throw std::system_error(
     // 'thread constructor failed')" (shared_f1223), so whatever followed here is not in the binary.   ?
+    // Real urnas log next (2026 urna data: investigation/README.md, finding C2): "Votação suspensa", only
+    // in the 3 key-offs between the election-day zerésima and the closing (none of the 246 before the
+    // zerésima); then "Desligando a urna" and "Finalização de aplicativo", in that order, after 249 of the
+    // 250 key-offs (the other was followed by a printer-jam line while the BU was printing).
 }
 
 // :153 / :156 (inlined into Run). The external flash (MV) disappeared: fatal error, except in

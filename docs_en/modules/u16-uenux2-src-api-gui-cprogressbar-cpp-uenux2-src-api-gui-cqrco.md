@@ -238,7 +238,10 @@ The BU payload, the hash chain and the signature are built elsewhere (`comum::CG
 `docs/bu/qrcode.md`, `docs/bu/build-a-bu.md`). This unit only renders them:
 
 1. **Printed BU** (`vota::CGeraBU::vf2`, u08): the header/body lines are `CTextFieldPaper(CDataText<…>, estilo)`
-   fields; for every "BU DIGITAL" part (`QRBU:i:n VRQR:6.0 …`, ≤ 1100 characters) the generator calls
+   fields; for every "BU DIGITAL" part (`QRBU:i:n VRQR:6.0 …`; ≤ 1100 characters except the last, which can reach 1245
+   with an Ed521 signature or 1259 with ECDSA, because in format 6.0 the last part's fixed text takes 422–436 characters,
+   more than the 277 reserved; only the width check above limits it; 2026 urna data: `investigation/README.md`,
+   finding H5) the generator calls
    `CQRCodeImagePaper::MontaImagem(400, parte)` and appends the raster with `CPaperFormBuilder::AddQRCode`
    (2775) under the label "-------------- 01 / 02 ---------------"; the "CERTIFICADO DIGITAL" QR codes
    (`QRCE:… IDUE:… MDUE:… CERT:…`, func 5634 / vota_f5591) use the same function. The printer driver writes

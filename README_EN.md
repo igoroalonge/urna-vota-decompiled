@@ -46,7 +46,14 @@ The documentation is in `docs_en/` (English original) and `docs/` (Portuguese tr
   tree, with web stand-ins for the hardware and placeholder signatures
   (`assinatura simulada para vota_web_wasm`). The real urnas of the 2026 election ran
   `10.23.0.0 - Praia da Barra do Cahy`. The result files and logs they wrote are consistent with this
-  code, which suggests the same source tree but does not prove the binaries are the same.
+  code, which suggests the same source tree but does not prove the binaries are the same. The logs
+  also show gaps in the reconstruction: 8 of the 191 VOTA log messages that real urnas wrote are not
+  in `src/` (the printer driver's, `Votação suspensa`, and a mesário-terminal display error); the
+  key-off shutdown ends after the key line, where real urnas go on to log `Desligando a urna` and
+  `Finalização de aplicativo`; and two log calls (`Título … para suspender a votação`) were
+  reconstructed as INFO, while the urnas log them as ALERTA. The published logs stop when `log.jez`
+  is packed, so the signing and copying of the result files never appear in them (2026 urna data:
+  `investigation/README.md`, findings C1, C2, C3 and G13).
 
 ## Reading the code
 

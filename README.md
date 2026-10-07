@@ -48,6 +48,14 @@ A documentação está em `docs/` (em português) e em `docs_en/` (o original em
   (`assinatura simulada para vota_web_wasm`). As urnas reais da eleição de 2026 rodaram
   `10.23.0.0 - Praia da Barra do Cahy`. Os arquivos de resultado e os logs que elas gravaram batem
   com este código, o que indica a mesma árvore de código, mas não prova que os binários são iguais.
+  Os logs também mostram lacunas da reconstrução: 8 das 191 mensagens de log do VOTA que as urnas
+  reais gravaram não estão em `src/` (as do driver da impressora, `Votação suspensa` e um erro de
+  exibição do terminal do mesário); o desligamento pela chave termina depois da linha da chave,
+  enquanto as urnas reais ainda registram `Desligando a urna` e `Finalização de aplicativo`; e duas
+  chamadas de log (`Título … para suspender a votação`) foram reconstruídas como INFO, mas as urnas
+  as registram como ALERTA. Os logs publicados param quando o `log.jez` é empacotado, então a
+  assinatura e a cópia dos arquivos de resultado nunca aparecem neles (dados das urnas de 2026:
+  `investigation/LEIAME.md`, achados C1, C2, C3 e G13).
 
 ## Como ler o código
 

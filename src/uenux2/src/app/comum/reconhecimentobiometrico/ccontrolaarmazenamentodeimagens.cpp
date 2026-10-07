@@ -69,10 +69,12 @@ CControlaArmazenamentoDeImagens::GerarCaminhosUnicos(const std::string& dirInter
 // string_view {data = 117, size = 7} (i64.const 30065124469). Address 117 lies below the first data
 // segment (1024) and holds 7 zero bytes at run time (read after votaInit), so in this build the path is
 // "/dsk/fi/estatico/chave/" followed by seven NULs. "wsq.pk1" is inferred from the length (7) and from
-// CGravadorWSQ::ValidaTipoBiometria (3796), which builds a std::string "wsq.pk1" (@353397).        ?
+// CGravadorWSQ::ValidaTipoBiometria (3796), which builds a std::string "wsq.pk1" (@353397). The real urna
+// strongly supports it: /dsk/fi/estatico/chave/wsq.pk1 is in every UF block of all four 2026 urna file lists,
+// and bio.sk1 is the only other 7-character key name there (2026 urna data: investigation/README.md, finding A3).
 std::vector<uebyte> CControlaArmazenamentoDeImagens::LeChavePublica()
 {
-    static constexpr std::string_view NOME_CHAVE = "wsq.pk1";                           // ? see above ({117, 7})
+    static constexpr std::string_view NOME_CHAVE = "wsq.pk1";                           // see above ({117, 7}); strongly supported by the 2026 urna lists (A3)
     const std::string arquivo = std::format("{}{}", CPath::GetPathChaves().c_str(), NOME_CHAVE);  // func 1948: "/dsk/fi/estatico/chave/"
     if (!api::CSystem::FileExists(arquivo))
         throw CUeComumReconhecimentoBiometricoError(EUeComumReconhecimentoBiometricoError{9000},

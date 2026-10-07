@@ -385,7 +385,10 @@ through u36 functions, in execution order during the encerramento (`vota::CGeraB
    '2'`; after `ValidaCriacao` only '2' can reach the reset), i.e. a pure contingency urna ('2') writes an
    `identificacaoContingencia` without a local. `CConversorEnvelopeGenerico` (10271) encodes the result. Envelope type 0 is
    `envelopeBoletimUrna (1)`.
-6. **The QR codes of the BU** (printed BU: parts of ≤ 1100 characters; on-screen "BU digital": ≤ 2500). The header is
+6. **The QR codes of the BU** (printed BU: parts of ≤ 1100 characters; on-screen "BU digital": ≤ 2500; except the last
+   part, which can reach 1245 (Ed521) or 1259 (ECDSA) characters printed and about 2659 on screen, because in format 6.0
+   its fixed text takes 422–436 characters, more than the 277 reserved; 2026 urna data: `investigation/README.md`,
+   finding H5). The header is
    built with `CCabecalhoQRCodeBuilder`, whose constructor (5624) zero-fills the 33 header strings. `SetHistoricoCargas`
    (5622) fills the `HistoricoCarga` field (+168) with **both** tags:
 

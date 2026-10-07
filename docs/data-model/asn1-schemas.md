@@ -462,6 +462,26 @@ o resultado byte a byte prova que o software real de 2024 usa os mesmos tipos de
 verificados apenas contra o texto publicado da v2 (tabela acima). Nenhum `-bu.dat` ou `-rdv.dat` v2 real
 foi decodificado.
 
+**O pacote de 2026.** O pacote "Formato dos arquivos de BU, RDV e assinatura digital" de 2026 do
+TSE (README datado de 2026-09-10) foi lido de uma cópia de terceiros, e não do site do TSE (ver
+"Fontes e procedência" no relatório da investigação). Comparado com o binário:
+
+* O `bu.asn1` é igual a `src/asn1` em 41/41 tipos estruturados, incluindo as três mudanças de
+  enumeração da tabela acima (`envelopeZeresimaImpressa(6)`, `contingenciaSecao(4)`,
+  `contingenciaEncerrandoSecao(6)`, `urnaEncerradaComEleitoresNaFila(5)`).
+* O `assinatura.asn1` tem o `ModeloEquipamento {tpm20, ue2013, ue2015, ue2020, ue2022}` do binário
+  e acrescenta `OrigemAssinaturaHardware {modeloEquipamento, algoritmoAssinatura}` e
+  `InfoChave ::= CHOICE {tagChaves [0], certificadoDigital [1]}`. Ele decodifica e recodifica
+  110/110 arquivos de assinatura reais de 2026; o texto da v2 falha em todos os 110.
+* O `rdv.asn1` é idêntico byte a byte ao arquivo v2 de 2024 e ainda diz `reservaSecao(4)`,
+  `reservaEncerrandoSecao(6)` e `urnaChegouAposInicioVotacao(5)`. A decodificação não é afetada
+  (mesmos números), mas `MotivoApuracaoMistaComBU = 5` quer dizer "chegou depois do início da
+  votação" em um arquivo do TSE e "encerrada com eleitores ainda na fila" no outro.
+
+Os arquivos reais de 2026 de 135 seções não trazem nenhum valor codificado fora das enumerações do
+binário (dados das urnas de 2026: [`investigation/LEIAME.md`](../../investigation/LEIAME.md),
+achados H6, H7, H8, B22).
+
 ---
 
 ## 6. Quais arquivos de cenário usam qual tipo

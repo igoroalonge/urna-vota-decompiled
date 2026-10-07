@@ -77,8 +77,10 @@ void ajustaAbrangenciaUFMunicipio(TMunicipioID& municipio, std::string& uf, cons
 
 } // namespace
 
-// wasm func 1705 (tools: api_f1705). Callers: wasm 7787 (start-up: "pu" partidos files for the pleito,
-// for UF-wide id 0 and for "br"), api::CFileASN::ReadFromFile@5778.                     name inferred
+// wasm func 1705 (tools: api_f1705). Callers: wasm 7787 (start-up: "pu" files, the parametrização da urna,
+// for the processo eleitoral, for UF-wide id 0 and for "br"), api::CFileASN::ReadFromFile@5778.  name inferred
+// "pu" is not partidos (those are "pa"), and the id is the processo eleitoral, not the pleito (2026 urna
+// data: investigation/README.md, findings E11, E12).
 std::string CNomeArquivo::MontaNome(EUrnaFase fase, uedword id, const std::string& uf,
                                     const std::string& sufixo, const std::string& extensao)
 {

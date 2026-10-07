@@ -351,11 +351,14 @@ codificado (`comum::asn::CConversorEstadoGeral::DesconverteEstadoUrna` 11398 / `
 
 | arquivo lido | cadeia observada |
 |---|---|
-| `-pu.dat` (nacional + UF) | 7787 → **9171** → 2665 → **1167** → 9218; 9171 → **9029**; 9171 → 9156 → 5102 → **9153**; 9156 → **9154** |
+| `-pu.dat` (nacional + UF; mídias reais: só o nacional, ver abaixo) | 7787 → **9171** → 2665 → **1167** → 9218; 9171 → **9029**; 9171 → 9156 → 5102 → **9153**; 9156 → **9154** |
 | `-cfm.dat` | 7787 → **9137** → 2665; **9136** → 1167 → **9142**; 9134; 9028 |
 | `-fe.dat` | 7787 → **9207** → 2665 (a lista está ausente) |
 | estado geral, `DadoCorrespondencia` (`CConversorDadoCorrespondencia`, u21) | 11397 → 5691 → 1563 → 11399 → **3734** → **6031**; 11398 → 5692 → 1008 → 11400 → **3733** → **6032** → 9224 |
 | foto `-fo.dat` | 3755 → **11440** → **5708** → 6032 → 9226 |
+
+No simulador, a 7787 lê o `-pu.dat` nacional e o de nível de UF. As mídias reais de 2026 e de 2024 trazem só o `o00000br-pu`
+nacional; como a 7787 trata a falta do arquivo de UF está em aberto (dados das urnas de 2026: investigation/LEIAME.md, achado E13).
 
 Nenhum erro `1900`/`1902` é lançado nas sessões gravadas. Os conversores de comparecimento (§5.1) não rodaram: pertencem
 ao fluxo de fim do dia.

@@ -138,7 +138,7 @@ api::CState
    ├─ vota::CEncerramentoHorarioInvalido(20 B)
    ├─ vota::CPerguntaFilaEleitorVazia   (20 B) "Todas as pessoas presentes já votaram?"
    ├─ vota::CAguardaEleitoresVotarem    (20 B, CAppState(0)) "Aguarde até todos os eleitores presentes votarem"
-   ├─ vota::CPedeTituloEncerramento     (32 B) presidente's título (u17)
+   ├─ vota::CPedeTituloEncerramento     (32 B) título to close the vote, any valid one (u17; §3.1 +120)
    ├─ vota::CRegistraDigitalOperador    (36 B) mesário fingerprint
    ├─ vota::CTentativaCapturaDigitalEsgotada, CDigitalNaoCapturada (20 B)
    ├─ vota::CPedeAnoNascimentoSemBiometria, CInformaEleitorPodeVotar, CInformaAnoNascimentoErrado (u10)
@@ -163,7 +163,7 @@ their first caller** (LTO), which is why the tools placed the construction of `C
 | +84 | `std::string` year of birth typed in the justification (`CPedeAnoNascimento`, func 10590) |
 | +96 | `std::string` título typed in the mesário registration (u22 slots 17/18) |
 | +108 | `std::string` "VOTANDO PARA: …" cargo text, initialised to `" "` (u10) |
-| +120 | `std::string` título typed by the presidente to close the vote (u17 `CPedeTituloEncerramento`) |
+| +120 | `std::string` título typed to close the vote (u17 `CPedeTituloEncerramento`): any all-digit entry valid as a título after zero-padding to 12 is accepted; nothing checks that it belongs to the presidente or a registered mesário (Res.-TSE 23.751/2026 art. 127 also allows a mesa member the presidente designates). 111 of 112 real closing títulos were a registered mesário's (2026 urna data: investigation/README.md, finding F3) |
 
 ## 4. Control flow
 

@@ -111,7 +111,7 @@ verificação de cadeia de hashes do TSE. Tudo abaixo foi lido das duas funçõe
 | seção: município, zona, local, seção, fase | `CLocal`, `CEstadoGeral` |
 | dhGeração / dhEmissão | "agora" / `EstadoGeralVota.dtHrEmissaoBU` (definido por `CGeraBU`) |
 | `CDadoCorrespondencia` | `EstadoGeral` +60: nº interno da urna, serial MC, data/hora e código da carga, gerador da mídia |
-| histórico de códigos de carga | `CEstadoGeralGap` (todas as cargas desta urna) |
+| histórico de códigos de carga | `CEstadoGeralGap`: o histórico de cargas da votação da seção, e não todas as cargas desta urna. Numa urna de contingência, ele começa com a carga da urna original da seção, pode incluir urnas de contingência intermediárias e termina com a carga da própria urna; uma nova carga o reinicia (dados das urnas de 2026: [investigation/LEIAME.md](../../investigation/LEIAME.md), achados D6, B15) |
 | aptos por abrangência | `CEleitores::GetQtdAptos()` (`SQtdeAptos` = {seção, TTE}) |
 | comparecimento | `CEleitores` +104 (verificado por assert como igual a `rdv.Comparecimento()`) |
 | urna biométrica + 3 contadores de habilitação | `CLocal`, `CEleitores` (sem biometria / por biometria / por biografia) |
@@ -193,7 +193,7 @@ Campos de `EntidadeBoletimUrna`, na ordem em que são preenchidos:
 | `qtdEleitoresCompareceram` | CEntidadeBU +174 |
 | `detalhamentoComparecimento` | opcional (urnas biométricas) |
 | `resultadosVotacaoPorEleicao` | abaixo |
-| `historicoCodigosCarga` | todos os códigos de carga, como `GeneralString` |
+| `historicoCodigosCarga` | o histórico de cargas da votação da seção (§3.1), como `GeneralString` (dados das urnas de 2026: [investigation/LEIAME.md](../../investigation/LEIAME.md), achados D6, B15) |
 | `historicoVotoImpresso` | opcional, só quando não vazio (nunca no VOTA: histórico do hardware de voto impresso) |
 
 O cabeçalho precisa identificar um **pleito** (tipo 1), senão **8607 "Erro no hash encadeado: Tipo de identificador do

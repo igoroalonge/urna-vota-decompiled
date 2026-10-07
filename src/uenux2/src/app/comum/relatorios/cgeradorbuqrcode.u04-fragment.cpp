@@ -273,7 +273,11 @@ SQRCodesBU CGeradorBUQRCode::GeraQRCodes(std::size_t tamanhoMaximo) const
     texto += corpo;
 
     // ---- 3. split into QR-sized parts ----------------------------------------------------------
-    // 277 characters are reserved for "QRBU:i:n VRQR:6.0 ", " HASH:<128 hex>" and " ASSI:...".
+    // 277 characters are reserved for "QRBU:i:n VRQR:6.0 ", " HASH:<128 hex>" and " ASSI:...". That covers every
+    // part but the last (header + HASH = 18 + 134); in format 6.0 the last part's fixed text is 18 + 134 + 270
+    // (132-byte Ed521 signature) or 284 (139-byte ECDSA) = 422-436, so the last QR can reach 1245/1259 characters
+    // (about 2659 with tamanhoMaximo = 2500) and nothing here rejects it (2026 urna data: investigation/README.md,
+    // finding H5).
     const std::size_t limite = tamanhoMaximo - 277;      // 823 for the BU (tamanhoMaximo = 1100)
     std::vector<std::string> partes;
     for (std::size_t pos = 0; pos != texto.size();) {

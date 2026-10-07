@@ -111,7 +111,7 @@ lines of the original files.
 | section: município, zona, local, seção, fase | `CLocal`, `CEstadoGeral` |
 | dhGeração / dhEmissão | "now" / `EstadoGeralVota.dtHrEmissaoBU` (set by `CGeraBU`) |
 | `CDadoCorrespondencia` | `EstadoGeral` +60: nº interno da urna, serial MC, data/hora e código da carga, gerador da mídia |
-| histórico de códigos de carga | `CEstadoGeralGap` (all loads of this urna) |
+| histórico de códigos de carga | `CEstadoGeralGap`: the carga history of the section's voting, not every load of this urna. On a contingency urna it starts with the original section urna's carga, can include intermediate contingency urnas and ends with this urna's own carga; a re-load restarts it (2026 urna data: [investigation/README.md](../../investigation/README.md), findings D6, B15) |
 | aptos per abrangência | `CEleitores::GetQtdAptos()` (`SQtdeAptos` = {seção, TTE}) |
 | comparecimento | `CEleitores` +104 (asserted equal to `rdv.Comparecimento()`) |
 | urna biométrica + 3 habilitação counters | `CLocal`, `CEleitores` (sem biometria / por biometria / por biografia) |
@@ -193,7 +193,7 @@ For **each election** of the pleito, in configuration order:
 | `qtdEleitoresCompareceram` | CEntidadeBU +174 |
 | `detalhamentoComparecimento` | optional (biometric urnas) |
 | `resultadosVotacaoPorEleicao` | below |
-| `historicoCodigosCarga` | every load code, as `GeneralString` |
+| `historicoCodigosCarga` | the carga history of the section's voting (§3.1), as `GeneralString` (2026 urna data: [investigation/README.md](../../investigation/README.md), findings D6, B15) |
 | `historicoVotoImpresso` | optional, only when non-empty (never in VOTA: printed-vote hardware history) |
 
 The header must identify a **pleito** (tipo 1), else **8607 "Erro no hash encadeado: Tipo de identificador do

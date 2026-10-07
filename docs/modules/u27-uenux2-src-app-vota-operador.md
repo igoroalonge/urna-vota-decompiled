@@ -138,7 +138,7 @@ api::CState
    ├─ vota::CEncerramentoHorarioInvalido(20 B)
    ├─ vota::CPerguntaFilaEleitorVazia   (20 B) "Todas as pessoas presentes já votaram?"
    ├─ vota::CAguardaEleitoresVotarem    (20 B, CAppState(0)) "Aguarde até todos os eleitores presentes votarem"
-   ├─ vota::CPedeTituloEncerramento     (32 B) presidente's título (u17)
+   ├─ vota::CPedeTituloEncerramento     (32 B) título to close the vote, any valid one (u17; §3.1 +120)
    ├─ vota::CRegistraDigitalOperador    (36 B) mesário fingerprint
    ├─ vota::CTentativaCapturaDigitalEsgotada, CDigitalNaoCapturada (20 B)
    ├─ vota::CPedeAnoNascimentoSemBiometria, CInformaEleitorPodeVotar, CInformaAnoNascimentoErrado (u10)
@@ -163,7 +163,7 @@ primeiro chamador** (LTO), e é por isso que as ferramentas colocaram a constru�
 | +84 | `std::string` ano de nascimento digitado na justificativa (`CPedeAnoNascimento`, func 10590) |
 | +96 | `std::string` título digitado no registro de mesários (slots 17/18 da u22) |
 | +108 | `std::string` texto do cargo "VOTANDO PARA: …", inicializado com `" "` (u10) |
-| +120 | `std::string` título digitado pelo presidente para encerrar a votação (u17 `CPedeTituloEncerramento`) |
+| +120 | `std::string` título digitado para encerrar a votação (u17 `CPedeTituloEncerramento`): aceita qualquer entrada só de dígitos que seja válida como título depois de completada com zeros até 12; nada verifica se ela pertence ao presidente ou a um mesário registrado (o art. 127 da Res.-TSE 23.751/2026 também permite um membro da mesa designado pelo presidente). 111 de 112 títulos de encerramento reais eram de um mesário registrado (dados das urnas de 2026: investigation/LEIAME.md, achado F3) |
 
 ## 4. Fluxo de controle
 

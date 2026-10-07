@@ -237,7 +237,10 @@ O payload do BU, a cadeia de hashes e a assinatura são construídos em outro lu
 `docs/bu/qrcode.md`, `docs/bu/build-a-bu.md`). Esta unidade apenas os renderiza:
 
 1. **BU impresso** (`vota::CGeraBU::vf2`, u08): as linhas de cabeçalho/corpo são campos `CTextFieldPaper(CDataText<…>, estilo)`;
-   para cada parte "BU DIGITAL" (`QRBU:i:n VRQR:6.0 …`, ≤ 1100 caracteres) o gerador chama
+   para cada parte "BU DIGITAL" (`QRBU:i:n VRQR:6.0 …`; ≤ 1100 caracteres, menos a última, que pode chegar a 1245
+   com assinatura Ed521 ou 1259 com ECDSA, porque no formato 6.0 a parte fixa da última ocupa 422–436 caracteres,
+   mais que os 277 reservados; só a verificação de largura acima a limita; dados das urnas de 2026:
+   `investigation/LEIAME.md`, achado H5) o gerador chama
    `CQRCodeImagePaper::MontaImagem(400, parte)` e acrescenta o raster com `CPaperFormBuilder::AddQRCode`
    (2775) sob o rótulo "-------------- 01 / 02 ---------------"; os QR codes de "CERTIFICADO DIGITAL"
    (`QRCE:… IDUE:… MDUE:… CERT:…`, func 5634 / vota_f5591) usam a mesma função. O driver da impressora grava

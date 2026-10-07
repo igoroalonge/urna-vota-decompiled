@@ -331,7 +331,7 @@ Campos opcionais usam o `includeOptionalField` gerado (func 515) / `removeOption
 | conversor | tipo ASN.1 (módulo) | classe de dados (layout) | observações |
 |---|---|---|---|
 | RegistroIdentificacaoEleitor 9114/9112 | `{identificacaoUtilizada, identificacaoPrincipal OPTIONAL}` (TiposEcoUrna) | `CRegistroIdentificacaoEleitor` (20 B) | principal presente se e somente se o opcional está preenchido; usado para eleitores, mesários e justificativas do arquivo de comparecimento |
-| IdentificadorGeradorMidia 9225/9224 | `{nome, serialCertificadoTPM, serialInstalacao}` | 3 x std::string (36 B) | dados do simulador: "simulador-votacao-ng", 64 x '0'; 9224 observada por meio de `CConversorDadoCorrespondencia` (11400, eg.bin) |
+| IdentificadorGeradorMidia 9225/9224 | `{nome, serialCertificadoTPM, serialInstalacao}` | 3 x std::string (36 B) | 9224 observada por meio de `CConversorDadoCorrespondencia` (11400, eg.bin); a correspondência do `eg.bin` do simulador (e, portanto, o seu BU) traz "nome_maquina" / "12345678" / "99999999" (func 9952), enquanto "simulador-votacao-ng" / 64 x '0' / "A1B2C3DA" é a fixture `infomidia-fv-*-t.dat`. Valores reais: um nome `Z<UF><zona:3>STD<2-3 dígitos>`, um serial de certificado EK do TPM de 8/20/32/40 hex e um serial de instalação de 8 hex (dados das urnas de 2026: investigation/LEIAME.md, achados E4, E5) |
 | MunicipioZona 9131 | `{municipio 1..99999, zona 1..9999}` | `CMunicipioZona` (8 B) | |
 | IdentificacaoSecaoEleitoral 9129 | `{municipioZona, local, secao}` | `CIdentificacaoSecaoEleitoral` (16 B; ctor 5110) | |
 | DetalhamentoComparecimento 9222 | BU `[1] {semBiometria, porBiometria, porBiografia}` | 3 x u16 | **BU**, §10 |

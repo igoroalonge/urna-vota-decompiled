@@ -384,7 +384,10 @@ por funções de u36, na ordem de execução durante o encerramento (`vota::CGer
    '2'`; após `ValidaCriacao` só '2' pode chegar ao reset), isto é, uma urna de contingência pura ('2') grava uma
    `identificacaoContingencia` sem local. `CConversorEnvelopeGenerico` (10271) codifica o resultado. O tipo de envelope 0 é
    `envelopeBoletimUrna (1)`.
-6. **Os QR codes do BU** (BU impresso: partes de ≤ 1100 caracteres; "BU digital" na tela: ≤ 2500). O cabeçalho é
+6. **Os QR codes do BU** (BU impresso: partes de ≤ 1100 caracteres; "BU digital" na tela: ≤ 2500; menos a última
+   parte, que pode chegar a 1245 (Ed521) ou 1259 (ECDSA) caracteres impressa e a cerca de 2659 na tela, porque no formato
+   6.0 sua parte fixa ocupa 422–436 caracteres, mais que os 277 reservados; dados das urnas de 2026:
+   `investigation/LEIAME.md`, achado H5). O cabeçalho é
    construído com `CCabecalhoQRCodeBuilder`, cujo construtor (5624) preenche com zeros as 33 strings do cabeçalho. `SetHistoricoCargas`
    (5622) preenche o campo `HistoricoCarga` (+168) com **ambas** as tags:
 

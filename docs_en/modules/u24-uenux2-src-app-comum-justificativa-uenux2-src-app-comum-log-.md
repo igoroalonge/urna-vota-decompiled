@@ -172,8 +172,11 @@ Errors: `CBaseError<EUeComumMdError, {8900, 8950}>` (thunk `comum_f591`). Member
 `FormataFase` ('1'/'2'/'3' → o/s/t, else 8950 "Fase inválida: {}", where the enum goes through the shared TSE enum formatter func 536 and prints its integer, e.g. `52`), `FormataNumero(n, casas)` (`std::format("{:0{}}")`; 8951 if longer),
 `FormataUF` (2 letters else 8952, lower-cased by `CStringUtils::ToLower`).
 
-* `MontaNome(fase, id, uf, sufixo, ext)` (1705, name inferred): pleito/UF level. At start-up 7787 builds
-  `t02400ac-pu.dat`, `t00000ac-pu.dat` and `t00000br-pu.dat` (partidos of the pleito, of the UF, national).
+* `MontaNome(fase, id, uf, sufixo, ext)` (1705, name inferred): processo eleitoral/UF level. At start-up 7787 builds
+  `t02400ac-pu.dat`, `t00000ac-pu.dat` and `t00000br-pu.dat` (urna parametrization of the simulator's processo eleitoral
+  02400, of the UF, national; parties are `-pa`, not `-pu`). Real 2026 and 2024 media carry only the national
+  `o00000br-pu`; how 7787 handles the missing UF-level files is open (2026 urna data: investigation/README.md,
+  findings E11, E12, E13).
 * `MontaNomesEleicao(id, pleito, município, idEleição, sufixo, ext)` (3744, name inferred): copies the eleição
   (`CPleito::GetEleicao`, cpleito.cpp:139, throws 8162 "Eleição não encontrada: {}"), and if it has at least one elective office (a cargo
   with `DetalheCargo`), applies `ajustaAbrangenciaUFMunicipio` (:208: municipal keeps UF+município, estadual sets
@@ -200,7 +203,9 @@ Called with (wsq, internal dir, external dir, prefix) by `CMostraEleitorVotando:
      `{data = 117, size = 7}` (`i64.const 30065124469`, format arg types 428 = `const char*` directory +
      `string_view` name). Address 117 is below the first data segment (1024) and holds 7 zero bytes at run time
      (read after `votaInit`), so the web build would look for `/dsk/fi/estatico/chave/` + seven NULs. `wsq.pk1`
-     (7 chars, the name `CGravadorWSQ::ValidaTipoBiometria` 3796 uses) is an inference. BER `EntidadeChave`; its
+     (7 chars, the name `CGravadorWSQ::ValidaTipoBiometria` 3796 uses) is an inference from this binary; the 2026 urna
+     lists strongly support it, with `/dsk/fi/estatico/chave/wsq.pk1` for every UF (2026 urna data:
+     investigation/README.md, finding A3). BER `EntidadeChave`; its
      `chave` field is deciphered with `CSymmetricCipherFactory::Cria(secret of IKernelHSM slot 3)`; empty result →
      9001 "O arquivo … está vazio". The `cifrado` flag is not consulted.
 5. Open `<internal>` with `"w+b"`, `FM_NOATIME`; write `EntidadeEnvelopeGenerico` { cabecalho = (pleito date at
@@ -353,4 +358,8 @@ resets of the `CLogComum` / `CArquivosResultado` singletons.
   `CJustificador` or to `CPedeAnoNascimento`.
 * Error code 8803 (unused) and the code of the folded line-33 check of `CIdentificacaoSecao` (8915 assumed).
 * Why the key-file name in 2725 is a `string_view` at address 117 (below `GLOBAL_BASE` 1024) instead of a
-  `.rodata` literal, and whether it really is `wsq.pk1`.
+  `.rodata` literal. That the name is `wsq.pk1` is now strongly supported: `/dsk/fi/estatico/chave/wsq.pk1` is in
+  every UF block of all four 2026 urna lists, and `bio.sk1` is the only other 7-character key name there (2026 urna
+  data: investigation/README.md, finding A3).
+* How 7787 handles the missing UF-level `-pu.dat` files on real media, which carry only the national `o00000br-pu`
+  (2026 urna data: investigation/README.md, finding E13).

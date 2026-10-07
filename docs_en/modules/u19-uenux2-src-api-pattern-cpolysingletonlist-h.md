@@ -394,9 +394,11 @@ the first time `GetQRDSInst()` runs:
      (5622)
 7. `CGeradorBUQRCodeVota(cabecalho, comparecimento, dhEmissao)` (func 5603). Then
    **`GeraQRCodes(2500)`** (func 5604). The printed BU (`CGeraBU`, func 12110) uses exactly the same header
-   and generator with **1100**. The screen QR codes therefore hold at most 2500 characters each (slices of
-   2500 − 277 = 2223 payload characters if the 277-character reserve described in `docs/bu/qrcode.md` §4
-   applies), so a BU needs fewer, denser codes on screen than on paper. The result is
+   and generator with **1100**. The screen QR codes therefore carry slices of 2500 − 277 = 2223 payload characters
+   (the 277-character reserve described in `docs/bu/qrcode.md` §4), so a BU needs fewer, denser codes on screen than
+   on paper. Every code but the last holds at most 2500 characters; the last can reach about 2659 (1245 with Ed521 or
+   1259 with ECDSA on paper), because in format 6.0 its fixed text (header, ` HASH:`, ` ASSI:`) takes 422–436
+   characters, more than the 277 reserved (2026 urna data: `investigation/README.md`, finding H5). The result is
    `{vector<string> conteudos, string assinatura}`. The signature string is dropped, because the `ASSI:`
    field is already inside the last payload.
 8. `IQRCodeBUDS(partes)` (vtable @1542092): `{vector<string> m_qrcodes (+4), size_t m_indice = 0 (+16)}`. It

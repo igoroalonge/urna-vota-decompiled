@@ -4,10 +4,12 @@
 // Names of the election data files ("dados estáticos") the urna loads from <flash>/estatico/:
 //   <fase><id:05><uf>[<município:05>[<zona:04><seção:04>]]-<sufixo>.<extensão>
 //   fase 'o' oficial / 's' simulado / 't' treinamento, uf in lower case ("br" for federal data).
-// Examples from the scenarios: t02400ac-pu.dat (pleito 2400, UF AC, "pu" = partidos),
+// Examples from the scenarios: t02400ac-pu.dat (processo eleitoral 2400, UF AC, "pu" = parametrização da urna),
 // t00000br-pu.dat, t02411ac00001-ca.dat (municipal eleição 2411, município 1, "ca" = candidatos),
 // t02511br00000-ca.dat (federal eleição), t02512ac00000-ca.dat (estadual eleição),
 // t02400ac0000100010001-tte.dat (zona 1, seção 1).
+// "pu" is the urna parametrization (EntidadeParametrizacaoUrna), not partidos, which are "pa" (2026 urna
+// data: investigation/README.md, finding E12).
 // Error family: CBaseError<EUeComumNomeArquivoError, SErrorLimits{8950, 9000}> (typeinfo @1558752,
 // vtable @1558772, constructor thunk wasm 2827): 8950 fase, 8951 número, 8952 UF, 8953 abrangência.
 #pragma once
@@ -33,7 +35,9 @@ using CUeComumNomeArquivoError =
 // SIdentificacaoCarga). Only the members read here are listed.                         name inferred
 struct SIdentificacaoCarga {
     EUrnaFase   fase;       // +0  CEstadoGeral +48, '1' oficial / '2' simulado / '3' treinamento
-    uedword     pleito;     // +4  CEstadoGeral +4
+    uedword     pleito;     // +4  CEstadoGeral +4. The processo eleitoral id (idPE), not the pleito:
+                            //     real 2026 -el/-tte/-imp names carry 01219, result files the pleito 03220
+                            //     (2026 urna data: investigation/README.md, finding E11).
     std::string uf;         // +8  CEstadoGeral +8 (already lower case)
 };
 

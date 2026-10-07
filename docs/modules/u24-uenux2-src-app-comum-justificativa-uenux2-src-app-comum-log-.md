@@ -172,8 +172,11 @@ Erros: `CBaseError<EUeComumMdError, {8900, 8950}>` (thunk `comum_f591`). Os memb
 `FormataFase` ('1'/'2'/'3' → o/s/t, senão 8950 "Fase inválida: {}", em que o enum passa pelo formatador de enums compartilhado do TSE, func 536, e imprime seu inteiro, por exemplo `52`), `FormataNumero(n, casas)` (`std::format("{:0{}}")`; 8951 se for mais longo),
 `FormataUF` (2 letras, senão 8952, convertidas para minúsculas por `CStringUtils::ToLower`).
 
-* `MontaNome(fase, id, uf, sufixo, ext)` (1705, nome inferido): nível de pleito/UF. Na inicialização, a 7787 constrói
-  `t02400ac-pu.dat`, `t00000ac-pu.dat` e `t00000br-pu.dat` (partidos do pleito, da UF, nacional).
+* `MontaNome(fase, id, uf, sufixo, ext)` (1705, nome inferido): nível de processo eleitoral/UF. Na inicialização, a 7787 constrói
+  `t02400ac-pu.dat`, `t00000ac-pu.dat` e `t00000br-pu.dat` (parametrização da urna do processo eleitoral 02400 do simulador,
+  da UF, nacional; os partidos são `-pa`, não `-pu`). As mídias reais de 2026 e de 2024 trazem só o `o00000br-pu`
+  nacional; como a 7787 trata a falta dos arquivos de nível de UF está em aberto (dados das urnas de 2026:
+  investigation/LEIAME.md, achados E11, E12, E13).
 * `MontaNomesEleicao(id, pleito, município, idEleição, sufixo, ext)` (3744, nome inferido): copia a eleição
   (`CPleito::GetEleicao`, cpleito.cpp:139, lança 8162 "Eleição não encontrada: {}") e, se ela tiver pelo menos um cargo eletivo (um cargo
   com `DetalheCargo`), aplica `ajustaAbrangenciaUFMunicipio` (:208: municipal mantém UF+município, estadual define
@@ -200,7 +203,9 @@ Chamada com (wsq, diretório interno, diretório externo, prefixo) por `CMostraE
      constante `{data = 117, size = 7}` (`i64.const 30065124469`, tipos de argumento de formatação 428 = diretório `const char*` +
      nome `string_view`). O endereço 117 está abaixo do primeiro segmento de dados (1024) e contém 7 bytes zero em tempo de execução
      (lidos depois do `votaInit`), então o build web procuraria `/dsk/fi/estatico/chave/` + sete NULs. `wsq.pk1`
-     (7 caracteres, o nome que `CGravadorWSQ::ValidaTipoBiometria` 3796 usa) é uma inferência. BER `EntidadeChave`; seu
+     (7 caracteres, o nome que `CGravadorWSQ::ValidaTipoBiometria` 3796 usa) é uma inferência a partir deste binário; as listas
+     de urna de 2026 lhe dão forte respaldo, com `/dsk/fi/estatico/chave/wsq.pk1` para toda UF (dados das urnas de 2026:
+     investigation/LEIAME.md, achado A3). BER `EntidadeChave`; seu
      campo `chave` é decifrado com `CSymmetricCipherFactory::Cria(secret of IKernelHSM slot 3)`; resultado vazio →
      9001 "O arquivo … está vazio". O flag `cifrado` não é consultado.
 5. Abre `<internal>` com `"w+b"`, `FM_NOATIME`; grava `EntidadeEnvelopeGenerico` { cabecalho = (data do pleito às
@@ -353,4 +358,8 @@ atexit dos singletons `CLogComum` / `CArquivosResultado`.
   `CJustificador` ou a `CPedeAnoNascimento`.
 * O código de erro 8803 (não usado) e o código da verificação da linha 33 de `CIdentificacaoSecao`, eliminada por dobramento de constantes (8915 presumido).
 * Por que o nome do arquivo de chave na 2725 é uma `string_view` no endereço 117 (abaixo de `GLOBAL_BASE` 1024) em vez de um
-  literal em `.rodata`, e se ele é de fato `wsq.pk1`.
+  literal em `.rodata`. Que o nome é `wsq.pk1` agora tem forte respaldo: `/dsk/fi/estatico/chave/wsq.pk1` está em todo
+  bloco de UF das quatro listas de urna de 2026, e `bio.sk1` é o único outro nome de chave com 7 caracteres ali
+  (dados das urnas de 2026: investigation/LEIAME.md, achado A3).
+* Como a 7787 trata a falta dos `-pu.dat` de nível de UF nas mídias reais, que trazem só o `o00000br-pu` nacional
+  (dados das urnas de 2026: investigation/LEIAME.md, achado E13).

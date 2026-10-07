@@ -465,6 +465,25 @@ the byte-exact result proves the real 2024 software uses the same **envelope and
 checked only against the published v2 text (table above). No real v2 `-bu.dat` or `-rdv.dat`
 was decoded.
 
+**The 2026 package.** TSE's 2026 "Formato dos arquivos de BU, RDV e assinatura digital" package
+(README dated 2026-09-10) was read from a third-party copy, not from TSE's site (see "Sources and
+provenance" in the investigation report). Compared with the binary:
+
+* `bu.asn1` equals `src/asn1` on 41/41 structured types, including the three enumeration changes
+  of the table above (`envelopeZeresimaImpressa(6)`, `contingenciaSecao(4)`,
+  `contingenciaEncerrandoSecao(6)`, `urnaEncerradaComEleitoresNaFila(5)`).
+* `assinatura.asn1` has the binary's `ModeloEquipamento {tpm20, ue2013, ue2015, ue2020, ue2022}`
+  and adds `OrigemAssinaturaHardware {modeloEquipamento, algoritmoAssinatura}` and
+  `InfoChave ::= CHOICE {tagChaves [0], certificadoDigital [1]}`. It decodes and re-encodes
+  110/110 real 2026 signature files; the v2 text fails on all 110.
+* `rdv.asn1` is byte-identical to the 2024 v2 file and still says `reservaSecao(4)`,
+  `reservaEncerrandoSecao(6)` and `urnaChegouAposInicioVotacao(5)`. Decoding is unaffected (same
+  numbers), but `MotivoApuracaoMistaComBU = 5` means "arrived after voting started" in one TSE
+  file and "closed with voters still in line" in the other.
+
+The real 2026 files of 135 sections carry no coded value outside the binary's enumerations (2026
+urna data: [`investigation/README.md`](../../investigation/README.md), findings H6, H7, H8, B22).
+
 ---
 
 ## 6. Which scenario files use which type
